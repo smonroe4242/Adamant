@@ -1,0 +1,66 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Player.gd" type="Script" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+[ext_resource path="res://BasePlat.tres" type="TileSet" id=3]
+[ext_resource path="res://RandProcRoom.gd" type="Script" id=4]
+[ext_resource path="res://RecursiveBT_Maze.gd" type="Script" id=5]
+[ext_resource path="res://SimplexNoiseTileMap.gd" type="Script" id=6]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 28.6378, 62.7758 )
+
+[node name="World" type="Node2D"]
+position = Vector2( 3072, 2432 )
+
+[node name="Level_rand_rule" type="Node2D" parent="."]
+position = Vector2( -1920, -1568 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="TileMap" type="TileMap" parent="Level_rand_rule"]
+tile_set = ExtResource( 3 )
+format = 1
+script = ExtResource( 4 )
+
+[node name="Level_noise" type="Node2D" parent="."]
+position = Vector2( -2816, 864 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="TileMap" type="TileMap" parent="Level_noise"]
+tile_set = ExtResource( 3 )
+format = 1
+script = ExtResource( 6 )
+
+[node name="Level_rbt_maze" type="Node2D" parent="."]
+position = Vector2( -2816, 864 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="TileMap" type="TileMap" parent="Level_rbt_maze"]
+tile_set = ExtResource( 3 )
+format = 1
+script = ExtResource( 5 )
+
+[node name="Player" type="KinematicBody2D" parent="."]
+position = Vector2( -1600, -2080 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player"]
+position = Vector2( 3.05176e-05, 0 )
+scale = Vector2( 0.900788, 1.9628 )
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource( 1 )
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+current = true
+zoom = Vector2( 5, 5 )
