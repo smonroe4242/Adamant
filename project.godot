@@ -17,7 +17,7 @@ _global_script_class_icons={
 
 config/name="Ady"
 run/main_scene="res://World.tscn"
-config/icon="res://icon.png"
+config/icon="res://assets/icon.png"
 
 [input]
 
