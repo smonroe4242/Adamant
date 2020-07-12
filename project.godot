@@ -8,16 +8,21 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Area2D",
+"class": "Ladder",
+"language": "GDScript",
+"path": "res://common/Ladder.gd"
+} ]
 _global_script_class_icons={
-
+"Ladder": ""
 }
 
 [application]
 
-config/name="Ady"
-run/main_scene="res://World.tscn"
-config/icon="res://icon.png"
+config/name="AdamantServer"
+run/main_scene="res://common/Entry.tscn"
+config/icon="res://assets/icon.png"
 
 [input]
 
