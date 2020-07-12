@@ -1,0 +1,89 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://game/SimplexNoise_ProcGen.gd" type="Script" id=1]
+[ext_resource path="res://game/Ladder.gd" type="Script" id=2]
+[ext_resource path="res://assets/New Piskel.png" type="Texture" id=3]
+[ext_resource path="res://assets/BasePlat.tres" type="TileSet" id=4]
+
+[sub_resource type="ConvexPolygonShape2D" id=1]
+points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
+
+[sub_resource type="GDScript" id=2]
+
+[sub_resource type="TileSet" id=3]
+0/name = "New Piskel.png 0"
+0/texture = ExtResource( 3 )
+0/tex_offset = Vector2( 0, 0 )
+0/modulate = Color( 1, 1, 1, 1 )
+0/region = Rect2( 0, 0, 64, 64 )
+0/tile_mode = 1
+0/autotile/bitmask_mode = 0
+0/autotile/bitmask_flags = [  ]
+0/autotile/icon_coordinate = Vector2( 0, 0 )
+0/autotile/tile_size = Vector2( 64, 64 )
+0/autotile/spacing = 0
+0/autotile/occluder_map = [  ]
+0/autotile/navpoly_map = [  ]
+0/autotile/priority_map = [  ]
+0/autotile/z_index_map = [  ]
+0/occluder_offset = Vector2( 0, 0 )
+0/navigation_offset = Vector2( 0, 0 )
+0/shape_offset = Vector2( 0, 0 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+0/shape = SubResource( 1 )
+0/shape_one_way = true
+0/shape_one_way_margin = 1.0
+0/shapes = [ {
+"autotile_coord": Vector2( 0, 0 ),
+"one_way": true,
+"one_way_margin": 1.0,
+"shape": SubResource( 1 ),
+"shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
+} ]
+0/z_index = 0
+script = SubResource( 2 )
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 64, 64 )
+
+[node name="World" type="Node2D"]
+
+[node name="Level_noise" type="Node2D" parent="."]
+position = Vector2( -1728, 192 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Noise" type="TileMap" parent="Level_noise"]
+scale = Vector2( 8, 8 )
+tile_set = ExtResource( 4 )
+cell_size = Vector2( 8, 8 )
+centered_textures = true
+format = 1
+
+[node name="Nav" type="TileMap" parent="Level_noise"]
+tile_set = SubResource( 3 )
+format = 1
+tile_data = PoolIntArray( -655324, 0, 0, -589788, 0, 0, -524252, 0, 0 )
+
+[node name="Ladder" type="Area2D" parent="."]
+position = Vector2( 256, 0 )
+space_override = 3
+gravity = 0.0
+collision_layer = 0
+collision_mask = 0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Ladder"]
+position = Vector2( -1.90735e-06, 1.90735e-06 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 64, 64 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladder"]
+shape = SubResource( 4 )
