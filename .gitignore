@@ -1,6 +1,5 @@
 .import/
 *.translation
-export_presets.cfg
 .mono/
 *.pck
 *.x86_64
