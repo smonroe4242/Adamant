@@ -8,6 +8,7 @@ var velocity = Vector2.UP
 var animation = "idle"
 var left_flip = false
 var jumping = false
+var onLadder := int(0)
 puppet var puppet_pos := Vector2()
 puppet var puppet_vel := Vector2()
 puppet var puppet_ani
@@ -37,14 +38,23 @@ func _physics_process(delta):
 			if is_on_floor():
 				animation = "idle"
 
-		if is_on_floor():
-			if Input.is_action_just_pressed('ui_up'):
+		if onLadder == 0:
+			if is_on_floor():
+				if Input.is_action_just_pressed('ui_up'):
+					velocity.y = -STEP
+					animation = "jump_start"
+					jumping = true
+				elif jumping == true:
+					animation = "jump_end"
+					jumping = false
+		else:
+			animation = "idle"
+			velocity.y = 0
+			if Input.is_action_pressed('ui_up'):
 				velocity.y = -STEP
-				animation = "jump_start"
-				jumping = true
-			elif jumping == true:
-				animation = "jump_end"
-				jumping = false
+			elif Input.is_action_pressed('ui_down'):
+				velocity.y = STEP
+			
 		rset_unreliable("puppet_pos", position)
 		rset_unreliable("puppet_vel", velocity)
 		rset_unreliable("puppet_ani", animation)

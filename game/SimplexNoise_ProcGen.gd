@@ -63,10 +63,15 @@ func clear_paths():
 			pass
 
 func place_tiles():
+	var ladder = preload("res://game/Ladder.tscn")
 	for x in size:
 		for y in size:
 			if grid[x][y] == LADDER:
-				nav.set_cell(x, y, 0)
+#				nav.set_cell(x, y, 0)
+				var pos = nav.map_to_world(Vector2(x, y))
+				var lad = ladder.instance()
+				lad.position = pos
+				add_child(lad)
 			else:
 				noise.set_cell(x, y, grid[x][y], false, false, false, _get_subtile_coord(grid[x][y]))
 

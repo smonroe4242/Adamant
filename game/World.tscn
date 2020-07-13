@@ -1,12 +1,8 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://game/SimplexNoise_ProcGen.gd" type="Script" id=1]
-[ext_resource path="res://game/Ladder.gd" type="Script" id=2]
 [ext_resource path="res://assets/New Piskel.png" type="Texture" id=3]
 [ext_resource path="res://assets/BasePlat.tres" type="TileSet" id=4]
-
-[sub_resource type="ConvexPolygonShape2D" id=1]
-points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 
 [sub_resource type="GDScript" id=2]
 
@@ -30,21 +26,11 @@ points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
 0/navigation_offset = Vector2( 0, 0 )
 0/shape_offset = Vector2( 0, 0 )
 0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
-0/shape = SubResource( 1 )
-0/shape_one_way = true
-0/shape_one_way_margin = 1.0
-0/shapes = [ {
-"autotile_coord": Vector2( 0, 0 ),
-"one_way": true,
-"one_way_margin": 1.0,
-"shape": SubResource( 1 ),
-"shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
-} ]
+0/shape_one_way = false
+0/shape_one_way_margin = 0.0
+0/shapes = [  ]
 0/z_index = 0
 script = SubResource( 2 )
-
-[sub_resource type="RectangleShape2D" id=4]
-extents = Vector2( 64, 64 )
 
 [node name="World" type="Node2D"]
 
@@ -66,24 +52,3 @@ format = 1
 tile_set = SubResource( 3 )
 format = 1
 tile_data = PoolIntArray( -655324, 0, 0, -589788, 0, 0, -524252, 0, 0 )
-
-[node name="Ladder" type="Area2D" parent="."]
-position = Vector2( 256, 0 )
-space_override = 3
-gravity = 0.0
-collision_layer = 0
-collision_mask = 0
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Sprite" type="Sprite" parent="Ladder"]
-position = Vector2( -1.90735e-06, 1.90735e-06 )
-scale = Vector2( 2, 2 )
-texture = ExtResource( 3 )
-region_enabled = true
-region_rect = Rect2( 0, 0, 64, 64 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ladder"]
-shape = SubResource( 4 )
