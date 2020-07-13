@@ -2,12 +2,13 @@ extends KinematicBody2D
 
 const UP = Vector2(0, -1)
 const GRAV = 20
-const STEP = 800
-const JUMP = -20
+const STEP = 450
+const JUMP = 500
 var velocity = Vector2.UP
 var animation = "idle"
 var left_flip = false
 var jumping = false
+var snap = Vector2(0, 16)
 var onLadder := int(0)
 puppet var puppet_pos := Vector2()
 puppet var puppet_vel := Vector2()
@@ -44,9 +45,11 @@ func _physics_process(delta):
 					velocity.y = -STEP
 					animation = "jump_start"
 					jumping = true
+					snap = Vector2(0, 0)
 				elif jumping == true:
 					animation = "jump_end"
 					jumping = false
+					snap = Vector2(0, 16)
 		else:
 			animation = "idle"
 			velocity.y = 0
@@ -68,6 +71,6 @@ func _physics_process(delta):
 	$AnimatedSprite.set_flip_h(left_flip)
 	$AnimatedSprite.animation = animation
 
-	velocity = move_and_slide(velocity, UP)
+	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
 	if not is_network_master():
 		puppet_pos = position

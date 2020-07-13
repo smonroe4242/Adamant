@@ -4,12 +4,16 @@ export var grid = []
 const size = 128
 var simplex = OpenSimplexNoise.new()
 # Auto Tile Consts
-const L_SLOPE = 2
-const R_SLOPE = 3
+const L_SLOPE = 3
+const R_SLOPE = 2
+const rock = 4
+const l_big = 5
+const r_big = 6
 const LADDER = 4
 
 onready var noise = $Noise
 onready var nav = $Nav
+onready var BG = $BG
 # Helper Functions:
 # is the cell cleared?
 func clr(cell):
@@ -72,8 +76,15 @@ func place_tiles():
 				var lad = ladder.instance()
 				lad.position = pos
 				add_child(lad)
+			elif grid[x][y] > 0 and grid[x][y] != L_SLOPE and grid[x][y] != R_SLOPE: #colliding block
+				if x > 0 and randi() % 2 == 1 and grid[x-1][y] > 0 and grid[x-1][y] != LADDER:
+					noise.set_cell(x-1, y, l_big)
+					noise.set_cell(x, y, r_big)
+				else:
+					noise.set_cell(x, y, rock)
 			else:
 				noise.set_cell(x, y, grid[x][y], false, false, false, _get_subtile_coord(grid[x][y]))
+			BG.set_cell(x, y, (randi() % 8) + 10)
 
 func _get_subtile_coord(id):
 	var nil = Vector2(0, 0)

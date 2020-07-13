@@ -473,8 +473,7 @@ animations = [ {
 "speed": 15.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=106]
-extents = Vector2( 28.6378, 62.7758 )
+[sub_resource type="CapsuleShape2D" id=106]
 
 [node name="Node2D" type="Node2D"]
 
@@ -486,15 +485,28 @@ script = ExtResource( 1 )
 position = Vector2( -0.420044, 96 )
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
-animation = "attack"
-frame = 16
+animation = "idle"
+frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2( -0.420044, 64 )
+position = Vector2( 10.8937, 83.0919 )
+scale = Vector2( 3, 3 )
 shape = SubResource( 106 )
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2( -0.420044, 32 )
 current = true
 zoom = Vector2( 2, 2 )
+
+[node name="RayCast2D" type="RayCast2D" parent="Player"]
+position = Vector2( -32.5269, 143.543 )
+enabled = true
+cast_to = Vector2( 0, 70 )
+collision_mask = 2147483652
+
+[node name="RayCast2D2" type="RayCast2D" parent="Player"]
+position = Vector2( 53.0331, 143.543 )
+enabled = true
+cast_to = Vector2( 0, 70 )
+collision_mask = 2147483652
