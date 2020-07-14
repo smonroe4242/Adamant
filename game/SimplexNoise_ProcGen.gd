@@ -122,7 +122,7 @@ func drop_ladders():
 
 # add slop blocks on one block high steps
 func smooth_noise():
-	for x in size + 1:
+	for x in size:
 		if grid[x][1] == EMPTY and grid[x][0] == FILL:
 			grid[x][0] = EMPTY
 		if grid[x][size - 1] == EMPTY and grid[x][size - 1] == FILL:
@@ -132,7 +132,7 @@ func smooth_noise():
 		if grid[size - 1][x] == EMPTY and grid[size - 1][x] == FILL:
 			grid[size][x] = EMPTY
 
-	for x in range(0, size):
+	for x in range(0, size - 1):
 		for y in range(0, size - 1):
 			if fil(grid[x + 1][y + 1]) and grid[x][y - 1] != LADDER and clr(grid[x][y]) and clr(grid[x + 1][y]) and clr(grid[x][y + 1]):
 					grid[x + 1][y + 1] = L_SLOPE

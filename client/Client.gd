@@ -63,11 +63,6 @@ remote func load_world(people):
 	for p in people:
 		load_player(p)
 
-func load_world_server():
-	var world = Node2D.new()
-	world.name = "World"
-	get_node(".").add_child(world)
-
 remote func load_player(id):
 	print("loading player ", id)
 	var selfId = get_tree().get_network_unique_id()

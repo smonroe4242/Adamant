@@ -6,6 +6,7 @@ var chunks = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("World ready")
 	var origin = Vector2(0, 0)
 	gen_chunk(origin)
 
