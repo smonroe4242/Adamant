@@ -14,14 +14,15 @@ puppet var puppet_pos := Vector2()
 puppet var puppet_vel := Vector2()
 puppet var puppet_ani
 puppet var puppet_lft
+onready var sprite = $AnimatedSprite
 
 func _ready():
 	puppet_pos = position
 	puppet_ani = animation
 	puppet_lft = left_flip
 
-func _physics_process(delta):
-	
+func _physics_process(_delta):
+#	print(position)
 	if is_network_master():
 		velocity.y += GRAV
 		if Input.is_action_pressed('ui_right'):
@@ -41,7 +42,7 @@ func _physics_process(delta):
 
 		if onLadder == 0:
 			if is_on_floor():
-				if Input.is_action_just_pressed('ui_up'):
+				if Input.is_action_pressed('ui_up'):
 					velocity.y = -STEP
 					animation = "jump_start"
 					jumping = true
@@ -68,8 +69,8 @@ func _physics_process(delta):
 		animation = puppet_ani
 		left_flip = puppet_lft
 
-	$AnimatedSprite.set_flip_h(left_flip)
-	$AnimatedSprite.animation = animation
+	sprite.set_flip_h(left_flip)
+	sprite.animation = animation
 
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
 	if not is_network_master():

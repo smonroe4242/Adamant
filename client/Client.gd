@@ -13,19 +13,17 @@ func _enter_tree():
 		tree.connect("network_peer_connected", self, "_client_connect")
 		tree.connect("network_peer_disconnected", self, "_client_disconnect")
 		peer.create_server(SERVER_PORT, MAX_PLAYERS)
-		tree.network_peer = peer
 		load_world({})
 		print("READY")
-	else:#elif OS.has_feature("client"):
+	else:
 		print("CLIENT")
-#		var tree = get_tree()
 		tree.connect("connected_to_server", self, "_server_connect")
 		tree.connect("connection_failed", self, "_server_connect_fail")
 		tree.connect("server_disconnected", self, "_server_disconnect")
-		peer = NetworkedMultiplayerENet.new()
 		peer.create_client(SERVER_IP, SERVER_PORT)
-		tree.network_peer = peer
 		print("READY")
+	tree.network_peer = peer
+
 func _server_connect():
 	print("Client: server connected")
 	
@@ -34,7 +32,7 @@ func _server_connect_fail():
 
 func _server_disconnect():
 	print("Client: server disconnected")
-###
+
 func _client_connect(id):
 	print("Server: Client ", str(id), " connected")
 	for i in players:
@@ -51,24 +49,34 @@ func _client_disconnect(id):
 	remove_player(id)
 
 remote func remove_player(id):
-	print("Server: removing player ", id)
+	print("removing player ", id)
 	var parent = get_node("./World")
 	var deadClient = parent.get_node(str(id))
 	parent.remove_child(deadClient)
+	deadClient.queue_free()
 
 remote func load_world(people):
-	print("Server: loading world with ", people)
+	print("loading world with ", people)
 	var world = preload("res://game/World.tscn").instance()
 	get_node(".").add_child(world)
 	
 	for p in people:
 		load_player(p)
 
+func load_world_server():
+	var world = Node2D.new()
+	world.name = "World"
+	get_node(".").add_child(world)
+
 remote func load_player(id):
-	print("Client: loading player ", id)
+	print("loading player ", id)
 	var selfId = get_tree().get_network_unique_id()
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
 	this_player.set_network_master(id)
-	this_player.get_node("Player/Camera2D").current = true if selfId == id else false
+	if selfId == id:
+		this_player.get_node("Player/Camera2D").current = true
+		this_player.position = Vector2(-5, -400)
+	else:
+		this_player.get_node("Player/Camera2D").current = false
 	get_node("./World").add_child(this_player)

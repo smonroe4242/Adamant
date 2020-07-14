@@ -1,6 +1,7 @@
-extends MarginContainer
-
-onready var leave = $LeaveButton
+extends Node2D
+const chunk_size = 48 # tiles per chunk
+const tile_size = 64 # pixels per tile
+const chunk_offset = chunk_size * tile_size
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
@@ -9,13 +10,6 @@ onready var leave = $LeaveButton
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-
-func _process(_delta):
-	if leave.pressed:
-		get_tree().network_peer = null
-		OS.kill(OS.get_process_id())
-#		get_tree().change_scene("res://game/Entry.tscn")
-#		get_tree().get_root().print_tree_pretty()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

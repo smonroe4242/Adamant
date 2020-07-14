@@ -1,66 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://game/SimplexNoise_ProcGen.gd" type="Script" id=1]
-[ext_resource path="res://assets/New Piskel.png" type="Texture" id=3]
-[ext_resource path="res://assets/BasePlat.tres" type="TileSet" id=4]
-
-[sub_resource type="GDScript" id=1]
-
-[sub_resource type="TileSet" id=2]
-0/name = "New Piskel.png 0"
-0/texture = ExtResource( 3 )
-0/tex_offset = Vector2( 0, 0 )
-0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 64, 64 )
-0/tile_mode = 1
-0/autotile/bitmask_mode = 0
-0/autotile/bitmask_flags = [  ]
-0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 64, 64 )
-0/autotile/spacing = 0
-0/autotile/occluder_map = [  ]
-0/autotile/navpoly_map = [  ]
-0/autotile/priority_map = [  ]
-0/autotile/z_index_map = [  ]
-0/occluder_offset = Vector2( 0, 0 )
-0/navigation_offset = Vector2( 0, 0 )
-0/shape_offset = Vector2( 0, 0 )
-0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
-0/shape_one_way = false
-0/shape_one_way_margin = 0.0
-0/shapes = [  ]
-0/z_index = 0
-script = SubResource( 1 )
+[ext_resource path="res://game/World.gd" type="Script" id=2]
 
 [node name="World" type="Node2D"]
-
-[node name="Level_noise" type="Node2D" parent="."]
-position = Vector2( -1728, 192 )
-script = ExtResource( 1 )
+script = ExtResource( 2 )
 __meta__ = {
-"_edit_group_": true
+"_edit_group_": true,
+"_edit_lock_": true
 }
-
-[node name="Noise" type="TileMap" parent="Level_noise"]
-scale = Vector2( 8, 8 )
-tile_set = ExtResource( 4 )
-cell_size = Vector2( 8, 8 )
-centered_textures = true
-collision_layer = 5
-collision_mask = 5
-format = 1
-
-[node name="BG" type="TileMap" parent="Level_noise"]
-scale = Vector2( 8, 8 )
-z_index = -1
-tile_set = ExtResource( 4 )
-cell_size = Vector2( 8, 8 )
-centered_textures = true
-collision_layer = 5
-collision_mask = 5
-format = 1
-
-[node name="Nav" type="TileMap" parent="Level_noise"]
-tile_set = SubResource( 2 )
-format = 1
-tile_data = PoolIntArray( -655324, 0, 0, -589788, 0, 0, -524252, 0, 0 )
