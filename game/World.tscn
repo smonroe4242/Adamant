@@ -41,6 +41,15 @@ __meta__ = {
 "_edit_group_": true
 }
 
+[node name="Light" type="TileMap" parent="Level_noise"]
+scale = Vector2( 8, 8 )
+tile_set = ExtResource( 4 )
+cell_size = Vector2( 8, 8 )
+centered_textures = true
+collision_layer = 5
+collision_mask = 5
+format = 1
+
 [node name="Noise" type="TileMap" parent="Level_noise"]
 scale = Vector2( 8, 8 )
 tile_set = ExtResource( 4 )

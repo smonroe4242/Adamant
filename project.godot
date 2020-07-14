@@ -24,6 +24,10 @@ config/name="AdamantServer"
 run/main_scene="res://client/Client.tscn"
 config/icon="res://assets/icon.png"
 
+[autoload]
+
+Global="*res://global.gd"
+
 [input]
 
 ui_left={

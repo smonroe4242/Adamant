@@ -28,6 +28,7 @@ func _enter_tree():
 		print("READY")
 func _server_connect():
 	print("Client: server connected")
+	rpc_id(1, "server_validate_login", get_tree().get_network_unique_id(), Global.username, Global.password)
 	
 func _server_connect_fail():
 	print("Client: server connect failed")
@@ -37,11 +38,6 @@ func _server_disconnect():
 ###
 func _client_connect(id):
 	print("Server: Client ", str(id), " connected")
-	for i in players:
-		rpc_id(i, "load_player", id)
-	players[id] = id
-	rpc_id(id, "load_world", players)
-	load_player(id)
 
 func _client_disconnect(id):
 	print("Server: Client ", str(id), " left")
@@ -49,6 +45,20 @@ func _client_disconnect(id):
 	for i in players:
 		rpc_id(i, "remove_player", id)
 	remove_player(id)
+
+remote func server_validate_login(id, user, passwd):
+	print("Server: Validating client ", str(id))
+	if (user == "invalid"):
+		rpc_id(id, "client_login_failed", "invalid user")
+	else:
+		for i in players:
+			rpc_id(i, "load_player", id)
+		players[id] = id
+		rpc_id(id, "load_world", players)
+		load_player(id)
+
+remote func client_login_failed(id, err):
+	print("Client: Login failed: ", str(err))
 
 remote func remove_player(id):
 	print("Server: removing player ", id)
