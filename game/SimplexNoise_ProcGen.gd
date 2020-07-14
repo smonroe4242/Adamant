@@ -2,9 +2,8 @@ extends Node2D
 class_name NoiseLevel
 var grid = []
 var coords = Vector2()
-var simplex = OpenSimplexNoise.new()
-
-const size = Global.chunk_size
+var simplex
+var size
 # Auto Tile Consts
 const EMPTY = 0
 const FILL = 1
@@ -18,31 +17,17 @@ const LADDER = 7
 onready var noise = $Noise
 onready var BG = $BG
 onready var nav = $Nav
-# Helper Functions:
-# seed generator
-func cantor_pairing_function(a, b):
-	# This function only handles natural numbers, eg x >= 0
-	# This is an arbitrary number added to make negative numbers positive
-	var unsigned = 151
-	var c = unsigned + a + unsigned + b # a + b must be less than signed_long_max
-	return ((c * (c + 1)) / 2) + unsigned + b # ((a + b) * (a + b)) + 1 must be less than signed_long_max
-# might be able to handle larger numbers this way, avoiding multiplying both full size numbers
-#	var d
-#   # only divide the even number by two to keep in integers
-#	if c & 1 == 0:
-#		d = (c / 2) * (c + 1)
-#	else:
-#		d = c * ((c + 1) / 2)
-#	return d + b
 
+func _enter_tree():
+	size = get_parent().size
+	simplex = get_parent().simplex
+# Helper Functions:
 # is the cell cleared?
 func clr(cell):
 	return cell == EMPTY or cell == LADDER
-
 # is the cell filled?
 func fil(cell):
 	return cell != EMPTY and cell != LADDER#not clr(cell)
-
 # get the right tile
 func _get_subtile_coord(id):
 	var nil = Vector2(0, 0)
@@ -57,26 +42,17 @@ func _get_subtile_coord(id):
 
 ### Level Generation
 
-# initialize OpenSimplexNoise parameters
-func make_noise():
-	#print("map_seed: ", map_seed)
-	simplex.seed = cantor_pairing_function(coords.x, coords.y)
-	simplex.lacunarity = 1.0
-	simplex.octaves = 1
-	simplex.period = 10.0
-	simplex.persistence = 1
-
 # create bitmap from simplex noise floats
 func make_grid():
+	var ref = coords * Vector2(size, size)
 	grid.resize(size + 1)
 	for x in size:
 		grid[x] = []
 		grid[x].resize(size+1)
 		for y in size:
-			grid[x][y] = EMPTY if simplex.get_noise_2d(x, y) < 0 else FILL
-#	print("top cell: ", grid[0][0])
+			grid[x][y] = EMPTY if simplex.get_noise_2dv(ref + Vector2(x, y)) < 0 else FILL
 
-# find thin walls to make in to caves
+# TODO [fix bsq] find thin walls to make in to caves
 func clear_paths():
 	var bsq = []
 	var maxsize = -1
@@ -86,14 +62,10 @@ func clear_paths():
 	for x in size:
 		bsq[x] = []
 		bsq[x].resize(size + 1)
-#		bsq[x][0] = grid[x][0]
 		for y in size:
 			bsq[x][y] = grid[x][y]
-#	for y in size:
-#		bsq[0][y] = grid[0][y]
 	for x in range(1, size):
 		for y in range(1, size):
-#			bsq[x][y] = 0 if grid[x][y] == 0 else 1
 			if grid[x][y] == 1:
 				bsq[x][y] = 1 + min(bsq[x][y - 1], min(bsq[x - 1][y], bsq[x - 1][y - 1]))
 			if maxsize < bsq[x][y]:
@@ -107,9 +79,7 @@ func clear_paths():
 			if bsq[x][y] == maxsize - 1:
 				for i in range(x, mx, -1):
 					for j in range(y, my, -1):
-#				print("Square: ", bsq[x][y])
 						grid[i][j] = LADDER
-	#print(bsq)
 # create Ladder objects at unjumpable overhangs
 func drop_ladders():
 	for x in range(1, size - 1):
@@ -119,7 +89,6 @@ func drop_ladders():
 				while drop < size and clr(grid[x][drop]):
 					grid[x][drop] = LADDER
 					drop += 1
-
 # add slop blocks on one block high steps
 func smooth_noise():
 	for x in size:
@@ -138,12 +107,9 @@ func smooth_noise():
 					grid[x + 1][y + 1] = L_SLOPE
 			elif fil(grid[x][y + 1]) and grid[x][y - 1] != LADDER and clr(grid[x][y]) and clr(grid[x + 1][y]) and clr(grid[x + 1][y + 1]):
 					grid[x][y + 1] = R_SLOPE
-
-
 # clear terrain between points a and b
 func punch_cave(_a, _b):
 	pass
-
 # transform from integer grid to tilemap
 func place_tiles():
 	var ladder = preload("res://game/Ladder.tscn")
@@ -162,13 +128,9 @@ func place_tiles():
 					noise.set_cell(x, y, ROCK)
 			else:
 				noise.set_cell(x, y, cell, false, false, false, _get_subtile_coord(cell))
-				BG.set_cell(x, y, (randi() & 7) + 10)
-
-
-# called on scene entry
+			BG.set_cell(x, y, (randi() & 7) + 10)
 # apply procgen layers to create traversable map at coords
 func _ready():
-	make_noise()
 	make_grid()
 #	clear_paths()
 	drop_ladders()
@@ -176,7 +138,6 @@ func _ready():
 	place_tiles()
 
 signal player_entered
-
 func _on_Area2D_body_entered(body):
 	if body.is_network_master():
 		emit_signal("player_entered", coords)

@@ -21,7 +21,7 @@
 0/z_index = 0
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 2048, 2048 )
+extents = Vector2( 1024, 1024 )
 
 [node name="NoiseLevel" type="Node2D"]
 script = ExtResource( 1 )
@@ -55,6 +55,6 @@ format = 1
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2( 2048, 2048 )
+position = Vector2( 1018, 1024 )
 shape = SubResource( 2 )
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

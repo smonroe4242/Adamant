@@ -1,63 +1,61 @@
 extends Node2D
-
-const LVL = preload("res://game/NoiseLevel.tscn")
-const OFF = Global.chunk_offset# second number is NoiseLevel.size
+const level = preload("res://game/NoiseLevel.tscn")
+const offset = Vector2(Global.chunk_offset, Global.chunk_offset)# second number is NoiseLevel.size
+const size = Global.chunk_size
+var simplex = OpenSimplexNoise.new()
 var chunks = {}
+var origin = Vector2(0, 0)
 
-# Called when the node enters the scene tree for the first time.
+# initialize noise generator
+func _enter_tree():
+	make_noise()
+
+# get the chunk the player starts in
 func _ready():
-	print("World ready")
-	var origin = Vector2(0, 0)
 	gen_chunk(origin)
+
+# initialize OpenSimplexNoise parameters
+func make_noise():
+	simplex.seed = 13
+	simplex.lacunarity = 2.0
+	simplex.octaves = 1
+	simplex.period = 10.0
+	simplex.persistence = 1
 
 func gen_chunk(v):
 	if v in chunks.keys():
 		return
-	var lvl = LVL.instance()
-#	var ext = OFF / 2
-#	var box = BoxShape.new()
-#	box.set_extents(Vector3(ext, ext, 0))
-#	var col = lvl.get_node("Area2D/CollisionShape2D")
-#	col.shape = box
-#	col.position = Vector2(ext, ext)
-	lvl.position = v * Vector2(OFF,OFF)
+	var lvl = level.instance()
+	lvl.position = v * offset
 	lvl.coords = v
 	lvl.connect("player_entered", self, "player_entered")
 	chunks[v] = lvl
 	call_deferred("add_child", lvl)
 
-func make_chunks(list):
-	for chunk in list:
-		gen_chunk(chunk)
-
 func kill_chunk(v):
 	if not v in chunks.keys():
 		return
-	remove_child(chunks[v])
+	print("Killing a chunk")
 	chunks[v].queue_free()
 	chunks.erase(v)
 
-func free_chunks(list):
-	for chunk in list:
-		kill_chunk(chunk)
-
-func get_borderv(origin):
+func get_borderv(v):
 	return [
-		origin, 
-		origin + Vector2.UP,
-		origin + Vector2.DOWN,
-		origin + Vector2.LEFT,
-		origin + Vector2.RIGHT,
-		origin + Vector2.UP + Vector2.LEFT,
-		origin + Vector2.UP + Vector2.RIGHT,
-		origin + Vector2.DOWN + Vector2.LEFT,
-		origin + Vector2.DOWN + Vector2.RIGHT,
+		v, 
+		v + Vector2.UP,
+		v + Vector2.DOWN,
+		v + Vector2.LEFT,
+		v + Vector2.RIGHT,
+		v + Vector2.UP + Vector2.LEFT,
+		v + Vector2.UP + Vector2.RIGHT,
+		v + Vector2.DOWN + Vector2.LEFT,
+		v + Vector2.DOWN + Vector2.RIGHT,
 		]
 
 func gen_block(v):
 	var block = get_borderv(v)
-	make_chunks(block)
-#	free_chunks(chunks.keys())
+	for chunk in block:
+		gen_chunk(chunk)
 	for chunk in chunks.keys():
 		if not chunk in block:
 			kill_chunk(chunk)

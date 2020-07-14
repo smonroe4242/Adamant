@@ -4,6 +4,7 @@ const SERVER_IP = "127.0.0.1"
 const SERVER_PORT = 8910
 const MAX_PLAYERS = 200
 var players := {}
+var loaded := {}
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
 	var tree = get_tree()
@@ -13,7 +14,7 @@ func _enter_tree():
 		tree.connect("network_peer_connected", self, "_client_connect")
 		tree.connect("network_peer_disconnected", self, "_client_disconnect")
 		peer.create_server(SERVER_PORT, MAX_PLAYERS)
-		load_world({})
+		load_world()
 		print("READY")
 	else:
 		print("CLIENT")
@@ -21,48 +22,49 @@ func _enter_tree():
 		tree.connect("connection_failed", self, "_server_connect_fail")
 		tree.connect("server_disconnected", self, "_server_disconnect")
 		peer.create_client(SERVER_IP, SERVER_PORT)
+		load_world()
 		print("READY")
 	tree.network_peer = peer
-
+#c
 func _server_connect():
 	print("Client: server connected")
-	
+#c
 func _server_connect_fail():
 	print("Client: server connect failed")
-
+#c
 func _server_disconnect():
 	print("Client: server disconnected")
-
+#s
 func _client_connect(id):
 	print("Server: Client ", str(id), " connected")
 	for i in players:
 		rpc_id(i, "load_player", id)
+		rpc_id(id, "load_player", i)
 	players[id] = id
-	rpc_id(id, "load_world", players)
-	load_player(id)
-
+#s
 func _client_disconnect(id):
 	print("Server: Client ", str(id), " left")
 	players.erase(id)
 	for i in players:
 		rpc_id(i, "remove_player", id)
 	remove_player(id)
-
+#b
 remote func remove_player(id):
 	print("removing player ", id)
 	var parent = get_node("./World")
 	var deadClient = parent.get_node(str(id))
-	parent.remove_child(deadClient)
-	deadClient.queue_free()
-
-remote func load_world(people):
-	print("loading world with ", people)
+	if not deadClient == null:
+		parent.remove_child(deadClient)
+		deadClient.queue_free()
+#b, server shouldnt need world except for tree structure
+remote func load_world():
 	var world = preload("res://game/World.tscn").instance()
 	get_node(".").add_child(world)
-	
-	for p in people:
-		load_player(p)
-
+#s
+remote func loaded_world(id):
+	loaded[id] = players[id]
+	players.erase(id)
+#b
 remote func load_player(id):
 	print("loading player ", id)
 	var selfId = get_tree().get_network_unique_id()
@@ -74,4 +76,4 @@ remote func load_player(id):
 		this_player.position = Vector2(-5, -400)
 	else:
 		this_player.get_node("Player/Camera2D").current = false
-	get_node("./World").add_child(this_player)
+	get_node("./World").call_deferred("add_child", this_player)
