@@ -4,3 +4,4 @@ const tile_size = 64 # pixels per tile
 const chunk_offset = chunk_size * tile_size
 export var username = ""
 export var password = ""
+export var server_ip = ""

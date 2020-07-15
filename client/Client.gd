@@ -15,7 +15,7 @@ func _enter_tree():
 			tree.connect("connected_to_server", self, "_server_connect")
 			tree.connect("connection_failed", self, "_server_connect_fail")
 			tree.connect("server_disconnected", self, "_server_disconnect")
-			peer.create_client(SERVER_IP, SERVER_PORT)
+			peer.create_client(Global.server_ip, SERVER_PORT)
 			load_world()
 			print("READY")
 		else:
@@ -38,7 +38,7 @@ func _enter_tree():
 			tree.connect("connected_to_server", self, "_server_connect")
 			tree.connect("connection_failed", self, "_server_connect_fail")
 			tree.connect("server_disconnected", self, "_server_disconnect")
-			peer.create_client(SERVER_IP, SERVER_PORT)
+			peer.create_client(Global.server_ip, SERVER_PORT)
 			load_world()
 			print("READY")
 	tree.network_peer = peer
@@ -101,7 +101,14 @@ remote func load_player(id, username):
 	var selfId = get_tree().get_network_unique_id()
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
-	this_player.set_network_master(id)
-	this_player.get_node("Player/Camera2D").current = true if selfId == id else false
 	this_player.get_node("Player").set_display_name(username)
+	if selfId == id:
+		this_player.set_network_master(id)
+		this_player.get_node("Player/Camera2D").current = true
+	elif selfId == 1:
+		this_player.set_network_master(id)
+		this_player.get_node("Player/Camera2D").current = false
+	else:
+		this_player.set_network_master(1)
+		this_player.get_node("Player/Camera2D").current = false
 	get_node("./World").call_deferred("add_child", this_player)

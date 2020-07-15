@@ -1,32 +1,47 @@
 extends KinematicBody2D
 
-const UP = Vector2(0, -1)
+#const UP = Vector2(0, -1)
 const GRAV = 20
 const STEP = 450
 const JUMP = 500
-var velocity = Vector2.UP
-var animation = "idle"
-var left_flip = false
-var jumping = false
-var snap = Vector2(0, 16)
+master var velocity := Vector2.UP
+master var animation := "idle"
+master var left_flip := false
+var jumping := false
+var snap := Vector2(0, 16)
 var onLadder := int(0)
-var displayName
-puppet var puppet_nam
-puppet var puppet_pos := Vector2()
-puppet var puppet_vel := Vector2()
-puppet var puppet_ani
-puppet var puppet_lft
-onready var sprite = $AnimatedSprite
-onready var label = $Label
+var displayName := "New Player"
+puppet var puppet_position := Vector2()
+puppet var puppet_velocity := Vector2()
+puppet var puppet_animation := "idle"
+puppet var puppet_left_flip := false
+onready var sprite := $AnimatedSprite
+onready var label := $Label
 
 func _ready():
-	puppet_pos = position
-	puppet_ani = animation
-	puppet_lft = left_flip
-	puppet_nam = displayName
+	puppet_position = position
+	puppet_animation = animation
+	puppet_left_flip = left_flip
+	label.text = displayName
+
+remote func set_vars(p, v, a, l):
+	position = p
+	velocity = v
+	animation = a
+	left_flip = l
+remote func set_puppet_vars(p, v, a, l):
+	puppet_position = p
+	puppet_velocity = v
+	puppet_animation = a
+	puppet_left_flip = l
 
 func _physics_process(_delta):
-	if is_network_master():
+	if get_tree().is_network_server():
+		# server replica code
+		rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip)
+	elif is_network_master():
+		# client og code
+		print("Client owned player")
 		velocity.y += GRAV
 		if Input.is_action_pressed('ui_right'):
 			velocity.x = STEP
@@ -61,26 +76,25 @@ func _physics_process(_delta):
 				velocity.y = -STEP
 			elif Input.is_action_pressed('ui_down'):
 				velocity.y = STEP
-
-		rset_unreliable("puppet_pos", position)
-		rset_unreliable("puppet_vel", velocity)
-		rset_unreliable("puppet_ani", animation)
-		rset_unreliable("puppet_lft", left_flip)
-		rset_unreliable("puppet_nam", displayName)
+# server replica, client replica, client og
+# client og moves, sends vars to server replica
+# server replica (verifies and) sends vars to client replicas
+# client replicas only receive
+		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip)
 	else:
-		position = puppet_pos
-		velocity = puppet_vel
-		animation = puppet_ani
-		left_flip = puppet_lft
-		displayName = puppet_nam
-	label.text = displayName
+		#client replica code
+		set_vars(
+			puppet_position,
+			puppet_velocity,
+			puppet_animation,
+			puppet_left_flip)
 
 	sprite.set_flip_h(left_flip)
 	sprite.animation = animation
 
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
 	if not is_network_master():
-		puppet_pos = position
+		puppet_position = position
 
 func set_display_name(user):
 		displayName = user

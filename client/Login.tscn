@@ -35,9 +35,9 @@ __meta__ = {
 
 [node name="GridContainer" type="GridContainer" parent="CanvasLayer/CenterContainer"]
 margin_left = 359.0
-margin_top = 213.0
+margin_top = 199.0
 margin_right = 665.0
-margin_bottom = 386.0
+margin_bottom = 401.0
 
 [node name="Label" type="Label" parent="CanvasLayer/CenterContainer/GridContainer"]
 margin_right = 306.0
@@ -48,10 +48,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="user" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
+[node name="server" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
 margin_top = 94.0
 margin_right = 306.0
 margin_bottom = 119.0
+hint_tooltip = "username"
+custom_fonts/font = SubResource( 2 )
+placeholder_text = "server ip"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="user" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
+margin_top = 123.0
+margin_right = 306.0
+margin_bottom = 148.0
 hint_tooltip = "username"
 custom_fonts/font = SubResource( 2 )
 placeholder_text = "username"
@@ -60,9 +71,9 @@ __meta__ = {
 }
 
 [node name="passwd" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 123.0
+margin_top = 152.0
 margin_right = 306.0
-margin_bottom = 148.0
+margin_bottom = 177.0
 hint_tooltip = "password"
 custom_fonts/font = SubResource( 3 )
 secret = true
@@ -72,9 +83,9 @@ __meta__ = {
 }
 
 [node name="Button" type="Button" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 152.0
+margin_top = 181.0
 margin_right = 306.0
-margin_bottom = 173.0
+margin_bottom = 202.0
 custom_fonts/font = SubResource( 4 )
 text = "Enter Realm"
 __meta__ = {
