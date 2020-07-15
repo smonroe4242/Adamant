@@ -1,4 +1,4 @@
-[gd_scene load_steps=115 format=2]
+[gd_scene load_steps=117 format=2]
 
 [ext_resource path="res://game/Player.gd" type="Script" id=1]
 [ext_resource path="res://assets/Knight/noBKG_KnightIdle_strip.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://assets/Knight/noBKG_KnightDeath_strip.png" type="Texture" id=6]
 [ext_resource path="res://assets/Knight/noBKG_KnightJumpAndFall_strip_normal.png" type="Texture" id=7]
 [ext_resource path="res://assets/Knight/noBKG_KnightShield_strip.png" type="Texture" id=8]
+[ext_resource path="res://assets/fonts/compass-pro-v1.1/CompassPro.otf" type="DynamicFontData" id=9]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 2 )
@@ -475,6 +476,10 @@ animations = [ {
 
 [sub_resource type="CapsuleShape2D" id=106]
 
+[sub_resource type="DynamicFont" id=107]
+size = 48
+font_data = ExtResource( 9 )
+
 [node name="Node2D" type="Node2D"]
 
 [node name="Player" type="KinematicBody2D" parent="."]
@@ -486,7 +491,7 @@ position = Vector2( -0.420044, 96 )
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
 animation = "idle"
-frame = 7
+frame = 1
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
@@ -510,3 +515,16 @@ position = Vector2( 53.0331, 143.543 )
 enabled = true
 cast_to = Vector2( 0, 70 )
 collision_mask = 2147483652
+
+[node name="Label" type="Label" parent="Player"]
+margin_left = -76.8408
+margin_top = 153.879
+margin_right = 94.1592
+margin_bottom = 198.879
+custom_fonts/font = SubResource( 107 )
+text = "Username"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}

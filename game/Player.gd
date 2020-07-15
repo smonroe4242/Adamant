@@ -10,6 +10,7 @@ var left_flip = false
 var jumping = false
 var snap = Vector2(0, 16)
 var onLadder := int(0)
+remote var displayName = ""
 puppet var puppet_pos := Vector2()
 puppet var puppet_vel := Vector2()
 puppet var puppet_ani
@@ -21,7 +22,6 @@ func _ready():
 	puppet_lft = left_flip
 
 func _physics_process(delta):
-	
 	if is_network_master():
 		velocity.y += GRAV
 		if Input.is_action_pressed('ui_right'):
@@ -67,6 +67,7 @@ func _physics_process(delta):
 		velocity = puppet_vel
 		animation = puppet_ani
 		left_flip = puppet_lft
+	$Label.text = displayName
 
 	$AnimatedSprite.set_flip_h(left_flip)
 	$AnimatedSprite.animation = animation
@@ -74,3 +75,7 @@ func _physics_process(delta):
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
 	if not is_network_master():
 		puppet_pos = position
+
+func set_display_name(user):
+	if OS.has_feature("server"):
+		rset_unreliable("displayName", user)

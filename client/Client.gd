@@ -8,7 +8,8 @@ var players := {}
 func _enter_tree():
 	var tree = get_tree()
 	var peer = NetworkedMultiplayerENet.new()
-	if OS.has_feature("server"):
+	print("INITIALIZING")
+	if OS.has_feature("server") or Global.is_server == 42:
 		print("SERVER")
 		tree.connect("network_peer_connected", self, "_client_connect")
 		tree.connect("network_peer_disconnected", self, "_client_disconnect")
@@ -50,12 +51,15 @@ remote func server_validate_login(id, user, passwd):
 	print("Server: Validating client ", str(id))
 	if (user == "invalid"):
 		rpc_id(id, "client_login_failed", "invalid user")
+		print("username! ", user)
 	else:
+		var px = load_player(id)
+		print("username ", user)
 		for i in players:
 			rpc_id(i, "load_player", id)
 		players[id] = id
 		rpc_id(id, "load_world", players)
-		load_player(id)
+		px.get_node("Player").set_display_name(user)
 
 remote func client_login_failed(id, err):
 	print("Client: Login failed: ", str(err))
@@ -82,3 +86,4 @@ remote func load_player(id):
 	this_player.set_network_master(id)
 	this_player.get_node("Player/Camera2D").current = true if selfId == id else false
 	get_node("./World").add_child(this_player)
+	return this_player
