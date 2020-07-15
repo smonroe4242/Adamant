@@ -488,7 +488,6 @@ script = ExtResource( 1 )
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
 animation = "idle"
-frame = 4
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
@@ -497,4 +496,4 @@ shape = SubResource( 106 )
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 current = true
-zoom = Vector2( 15, 15 )
+zoom = Vector2( 10, 10 )

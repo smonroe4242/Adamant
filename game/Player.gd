@@ -58,7 +58,7 @@ func _physics_process(_delta):
 				velocity.y = -STEP
 			elif Input.is_action_pressed('ui_down'):
 				velocity.y = STEP
-			
+
 		rset_unreliable("puppet_pos", position)
 		rset_unreliable("puppet_vel", velocity)
 		rset_unreliable("puppet_ani", animation)

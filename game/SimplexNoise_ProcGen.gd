@@ -129,6 +129,7 @@ func place_tiles():
 			else:
 				noise.set_cell(x, y, cell, false, false, false, _get_subtile_coord(cell))
 			BG.set_cell(x, y, (randi() & 7) + 10)
+
 # apply procgen layers to create traversable map at coords
 func _ready():
 	make_grid()
@@ -139,5 +140,5 @@ func _ready():
 
 signal player_entered
 func _on_Area2D_body_entered(body):
-	if body.is_network_master():
+	if body.is_network_master() and not body.get('onLadder') == null:
 		emit_signal("player_entered", coords)

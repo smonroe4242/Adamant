@@ -41,7 +41,7 @@ func kill_chunk(v):
 
 func get_borderv(v):
 	return [
-		v, 
+		v,
 		v + Vector2.UP,
 		v + Vector2.DOWN,
 		v + Vector2.LEFT,
