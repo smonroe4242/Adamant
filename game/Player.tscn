@@ -493,7 +493,7 @@ script = ExtResource( 1 )
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
 animation = "idle"
-frame = 5
+frame = 6
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
@@ -511,6 +511,7 @@ margin_left = -85.0
 margin_top = -128.0
 margin_right = 86.0
 margin_bottom = -64.0
+grow_horizontal = 2
 custom_fonts/font = SubResource( 107 )
 text = "Username"
 align = 1
