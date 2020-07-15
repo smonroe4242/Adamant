@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://game/NoiseLevel.gd" type="Script" id=1]
+[ext_resource path="res://assets/BasePlat.tres" type="TileSet" id=2]
+[ext_resource path="res://assets/New Piskel.png" type="Texture" id=3]
+
+[sub_resource type="TileSet" id=1]
+0/name = "New Piskel.png 0"
+0/texture = ExtResource( 3 )
+0/tex_offset = Vector2( 0, 0 )
+0/modulate = Color( 1, 1, 1, 1 )
+0/region = Rect2( 0, 0, 64, 64 )
+0/tile_mode = 0
+0/occluder_offset = Vector2( 0, 0 )
+0/navigation_offset = Vector2( 0, 0 )
+0/shape_offset = Vector2( 0, 0 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+0/shape_one_way = false
+0/shape_one_way_margin = 0.0
+0/shapes = [  ]
+0/z_index = 0
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 1024, 1024 )
+
+[node name="NoiseLevel" type="Node2D"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Noise" type="TileMap" parent="."]
+scale = Vector2( 8, 8 )
+tile_set = ExtResource( 2 )
+cell_size = Vector2( 8, 8 )
+centered_textures = true
+collision_layer = 5
+collision_mask = 5
+format = 1
+
+[node name="BG" type="TileMap" parent="."]
+scale = Vector2( 8, 8 )
+z_index = -1
+tile_set = ExtResource( 2 )
+cell_size = Vector2( 8, 8 )
+centered_textures = true
+collision_layer = 5
+collision_mask = 5
+format = 1
+
+[node name="Nav" type="TileMap" parent="."]
+tile_set = SubResource( 1 )
+format = 1
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 1018, 1024 )
+shape = SubResource( 2 )
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
