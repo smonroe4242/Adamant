@@ -21,7 +21,7 @@ _global_script_class_icons={
 [application]
 
 config/name="AdamantServer"
-run/main_scene="res://client/login.tscn"
+run/main_scene="res://client/Login.tscn"
 config/icon="res://assets/icon.png"
 
 [autoload]

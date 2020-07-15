@@ -30,7 +30,7 @@ func _enter_tree():
 func _server_connect():
 	print("Client: server connected")
 	rpc_id(1, "server_validate_login", get_tree().get_network_unique_id(), Global.username, Global.password)
-	
+
 func _server_connect_fail():
 	print("Client: server connect failed")
 
@@ -74,7 +74,7 @@ remote func load_world(people):
 	print("Server: loading world with ", people)
 	var world = preload("res://game/World.tscn").instance()
 	get_node(".").add_child(world)
-	
+
 	for p in people:
 		load_player(p)
 
