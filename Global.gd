@@ -9,3 +9,4 @@ export var username = ""
 export var password = ""
 # warning-ignore:unused_class_variable
 export var server_ip = ""
+var player_node = null
