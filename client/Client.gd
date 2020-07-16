@@ -111,6 +111,7 @@ remote func load_player(id, username):
 	if selfId == id: # owning client
 		this_player.set_network_master(id)
 		this_player.get_node("Camera2D").current = true
+		Global.player_node = this_player
 	elif selfId == 1:
 	# server replica, would like to replace with shallow clone with only vars and rpcs
 		this_player.set_network_master(id)

@@ -10,7 +10,6 @@ master var left_flip := false
 var jumping := false
 var snap := Vector2(0, 16)
 var onLadder := int(0)
-<<<<<<< Updated upstream
 var displayName := "New Player"
 puppet var puppet_position := Vector2()
 puppet var puppet_velocity := Vector2()
@@ -23,6 +22,7 @@ var mhp = 100
 var attack_phase = 0
 var attacking = false
 var blocking = false
+var swung = false
 puppet var puppet_hp = 100
 puppet var puppet_mhp = 100
 var attack_timer = null
@@ -42,17 +42,19 @@ func _ready():
 # but we had an error with it so come back when we understand
 # godot networking better
 ### TODO master and pupper
-remote func set_vars(p, v, a, l):
+remote func set_vars(p, v, a, l, h):
 	position = p
 	velocity = v
 	animation = a
 	left_flip = l
+	hp = h
 
-remote func set_puppet_vars(p, v, a, l):
+remote func set_puppet_vars(p, v, a, l, h):
 	puppet_position = p
 	puppet_velocity = v
 	puppet_animation = a
 	puppet_left_flip = l
+	puppet_hp = h
 
 func _attack_finish():
 	attack_phase = 0
@@ -60,8 +62,36 @@ func _attack_finish():
 	attacking = false
 	pass
 
+remote func request_damage(targets):
+	var parent = get_parent()
+	# a naively trusting damage calculation
+	for target in targets:
+		var t = parent.get_node(str(target))
+		if t == null:
+			print("bad")
+		else:
+			print(t.name)
+		t.damage(30)
+		if t.hp < 0:
+			rpc_id(int(target), "die")
+
+func swing():
+	if (swung != true):
+		var ids = []
+		var sz = 0
+		swung = true
+		print("DMG")
+		if is_network_master():
+			print("go")
+			for b in $Area2D.get_overlapping_areas():
+				print(b.get_parent().name)
+				ids.append(b.get_parent().name)
+		rpc_id(1, "request_damage", ids)
+	pass
+
 func attack():
 	attacking = true
+	swung = false
 	if attack_phase == 0:
 		attack_phase += 1
 		print("attack")
@@ -74,9 +104,11 @@ func attack():
 func _physics_process(_delta):
 	if get_tree().is_network_server():
 		# server replica code
-		rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip)
-	elif is_network_master():
+		rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip, hp)
+	elif is_network_master() and hp > 0:
 		# client og code
+		if (animation == "attack_1") and $AnimatedSprite.frame == 2:
+			swing()
 		velocity.y += GRAV
 		if Input.is_action_pressed('block') and attacking != true:
 			animation = "block"
@@ -133,15 +165,15 @@ func _physics_process(_delta):
 # client og moves, sends vars to server replica, so master
 # server replica (verifies and) sends vars to client replicas, so master? but puppet for owning client?
 # client replicas only receive, so puppet
-		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip)
+		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, hp)
 	else:
 		#client replica code
 		set_vars(
 			puppet_position,
 			puppet_velocity,
 			puppet_animation,
-			puppet_left_flip)
-		hp = puppet_hp
+			puppet_left_flip,
+			puppet_hp)
 		mhp = puppet_mhp
 
 # warning-ignore:unsafe_method_access
@@ -156,5 +188,18 @@ func _physics_process(_delta):
 func set_display_name(user):
 	displayName = user
 
-func damage(amt):
+remote func damage(amt):
+	print(name, " damaged (", str(hp - amt), ")", str(get_tree().get_network_unique_id()))
+
+	if get_tree().is_network_server():
+		if (hp - amt < 0):
+			print("DEATH")
+			die()
+			rpc_unreliable("die")
+		else:
+			rpc_unreliable("damage", amt)
 	hp -= amt
+
+remote func die():
+	hp = 0
+	animation = "death"
