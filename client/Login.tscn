@@ -54,6 +54,7 @@ margin_right = 306.0
 margin_bottom = 119.0
 hint_tooltip = "username"
 custom_fonts/font = SubResource( 2 )
+text = "127.0.0.1"
 placeholder_text = "server ip"
 __meta__ = {
 "_edit_use_anchors_": false

@@ -480,32 +480,29 @@ animations = [ {
 size = 48
 font_data = ExtResource( 9 )
 
-[node name="Node2D" type="Node2D"]
+[node name="KinematicBody2D" type="KinematicBody2D"]
+collision_layer = 16
+script = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true,
 "_edit_lock_": true
 }
 
-[node name="Player" type="KinematicBody2D" parent="."]
-z_index = 1
-script = ExtResource( 1 )
-
-[node name="AnimatedSprite" type="AnimatedSprite" parent="Player"]
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
 animation = "idle"
-frame = 10
 playing = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 scale = Vector2( 3, 3 )
 shape = SubResource( 106 )
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
+[node name="Camera2D" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 2, 2 )
+zoom = Vector2( 8, 8 )
 
-[node name="Label" type="Label" parent="Player"]
+[node name="Label" type="Label" parent="."]
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -85.0

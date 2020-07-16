@@ -22,13 +22,19 @@ func _ready():
 	puppet_position = position
 	puppet_animation = animation
 	puppet_left_flip = left_flip
+# warning-ignore:unsafe_property_access
 	label.text = displayName
 
+# unsafe because network ownership is not checked
+# but we had an error with it so come back when we understand
+# godot networking better
+### TODO master and pupper
 remote func set_vars(p, v, a, l):
 	position = p
 	velocity = v
 	animation = a
 	left_flip = l
+
 remote func set_puppet_vars(p, v, a, l):
 	puppet_position = p
 	puppet_velocity = v
@@ -41,7 +47,6 @@ func _physics_process(_delta):
 		rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip)
 	elif is_network_master():
 		# client og code
-		print("Client owned player")
 		velocity.y += GRAV
 		if Input.is_action_pressed('ui_right'):
 			velocity.x = STEP
@@ -77,9 +82,9 @@ func _physics_process(_delta):
 			elif Input.is_action_pressed('ui_down'):
 				velocity.y = STEP
 # server replica, client replica, client og
-# client og moves, sends vars to server replica
-# server replica (verifies and) sends vars to client replicas
-# client replicas only receive
+# client og moves, sends vars to server replica, so master
+# server replica (verifies and) sends vars to client replicas, so master? but puppet for owning client?
+# client replicas only receive, so puppet
 		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip)
 	else:
 		#client replica code
@@ -89,7 +94,9 @@ func _physics_process(_delta):
 			puppet_animation,
 			puppet_left_flip)
 
+# warning-ignore:unsafe_method_access
 	sprite.set_flip_h(left_flip)
+# warning-ignore:unsafe_property_access
 	sprite.animation = animation
 
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
