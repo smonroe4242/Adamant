@@ -5,17 +5,18 @@ const size = Global.chunk_size
 var simplex = OpenSimplexNoise.new()
 var chunks = {}
 var origin = Vector2(0, 0)
-
+enum biome {SKY, OVERWORLD, CAVE}
 # initialize noise generator
 func _enter_tree():
 	make_noise()
 
 # get the chunk the player starts in
 func _ready():
-	gen_chunk(origin)
+	gen_chunk(Vector2(int(origin.x / offset.x), int(origin.y / offset.y)))
 
 # initialize OpenSimplexNoise parameters
 func make_noise():
+	print("world entered tree")
 	simplex.seed = 13
 	simplex.lacunarity = 2.0
 	simplex.octaves = 1
@@ -26,6 +27,8 @@ func gen_chunk(v):
 	if v in chunks.keys():
 		return
 	var lvl = level.instance()
+	lvl.type = biome.OVERWORLD if v.y == 0 else biome.CAVE if v.y > 0 else biome.SKY
+	print("Gen  chunk")
 	lvl.position = v * offset
 	lvl.coords = v
 	lvl.connect("player_entered", self, "player_entered")
