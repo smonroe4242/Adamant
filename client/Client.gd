@@ -3,7 +3,7 @@ extends Node2D
 const SERVER_PORT = 8910
 const MAX_PLAYERS = 200
 var players := {}
-
+var spawn := {}
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
 	var editor_be_server = false
@@ -21,6 +21,7 @@ func _enter_tree():
 func init_client():
 	print("CLIENT")
 	var tree = get_tree()
+	tree.set_debug_collisions_hint(false)
 	var peer = NetworkedMultiplayerENet.new()
 	tree.connect("connected_to_server", self, "_server_connect")
 	tree.connect("connection_failed", self, "_server_connect_fail")
@@ -61,6 +62,7 @@ func _client_connect(id):
 func _client_disconnect(id):
 	print("Server: Client ", str(id), " left")
 # warning-ignore:return_value_discarded
+	spawn[players[id]] = get_node("./World/" + str(id)).position
 	players.erase(id)
 	for i in players:
 		rpc_id(i, "remove_player", id)
@@ -72,13 +74,15 @@ remote func server_validate_login(id, user, passwd):
 		rpc_id(id, "client_login_failed", "invalid user")
 		print("username bad! ", user)
 	else:
-		print("username good", user)
-		load_player(id, user)
-		rpc_id(id, "load_world")
-		rpc_id(id, "load_player", id, user)
+		print("username good ", user)
+		if not user in spawn.keys():
+			spawn[user] = Vector2(512,512)
+		load_player(id, user, spawn[user])
+		rpc_id(id, "load_world", spawn[user])
+		rpc_id(id, "load_player", id, user, spawn[user])
 		for i in players.keys():
-			rpc_id(i, "load_player", id, user)
-			rpc_id(id, "load_player", i, players[i])
+			rpc_id(i, "load_player", id, user, spawn[user])
+			rpc_id(id, "load_player", i, players[i], spawn[players[i]])
 		players[id] = user
 #c
 remote func client_login_failed(err):
@@ -93,8 +97,9 @@ remote func remove_player(id):
 	if not deadClient == null:
 		deadClient.queue_free()
 #c
-remote func load_world():
+remote func load_world(origin):
 	var world = preload("res://game/World.tscn").instance()
+	world.origin = origin
 	get_node(".").add_child(world)
 #s
 func load_world_server():
@@ -102,12 +107,13 @@ func load_world_server():
 	world.name = "World"
 	get_node(".").add_child(world)
 #b
-remote func load_player(id, username):
+remote func load_player(id, username, origin):
 	print("loading player ", username)
 	var selfId = get_tree().get_network_unique_id()
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
 	this_player.set_display_name(username)
+	this_player.position = origin
 	if selfId == id: # owning client
 		this_player.set_network_master(id)
 		this_player.get_node("Camera2D").current = true

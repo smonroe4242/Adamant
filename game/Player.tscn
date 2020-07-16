@@ -1,4 +1,4 @@
-[gd_scene load_steps=117 format=2]
+[gd_scene load_steps=118 format=2]
 
 [ext_resource path="res://game/Player.gd" type="Script" id=1]
 [ext_resource path="res://assets/Knight/noBKG_KnightIdle_strip.png" type="Texture" id=2]
@@ -480,11 +480,14 @@ animations = [ {
 size = 48
 font_data = ExtResource( 9 )
 
+[sub_resource type="RectangleShape2D" id=108]
+extents = Vector2( 0.001, 0.001 )
+
 [node name="KinematicBody2D" type="KinematicBody2D"]
+z_index = 10
 collision_layer = 16
 script = ExtResource( 1 )
 __meta__ = {
-"_edit_group_": true,
 "_edit_lock_": true
 }
 
@@ -492,6 +495,7 @@ __meta__ = {
 scale = Vector2( 4, 4 )
 frames = SubResource( 105 )
 animation = "idle"
+frame = 12
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -500,7 +504,7 @@ shape = SubResource( 106 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 8, 8 )
+zoom = Vector2( 2, 2 )
 
 [node name="Label" type="Label" parent="."]
 anchor_left = 0.5
@@ -517,3 +521,12 @@ valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2( -1, 0 )
+collision_layer = 2
+collision_mask = 2
+
+[node name="ChunkCollider" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( -3, -4 )
+shape = SubResource( 108 )
