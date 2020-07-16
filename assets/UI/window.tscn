@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://assets/UI/window.png" type="Texture" id=1]
+[ext_resource path="res://assets/UI/close.png" type="Texture" id=2]
+[ext_resource path="res://assets/fonts/mainfont.tres" type="DynamicFont" id=3]
+
+
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 1 )
+margin_left = 5.0
+margin_right = 5.0
+margin_top = 5.0
+margin_bottom = 5.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="WindowDialog" type="WindowDialog"]
+visible = true
+margin_left = 216.0
+margin_top = 193.0
+margin_right = 292.0
+margin_bottom = 231.0
+custom_icons/close = ExtResource( 2 )
+custom_styles/panel = SubResource( 1 )
+custom_fonts/title_font = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
