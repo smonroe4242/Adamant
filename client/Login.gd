@@ -8,7 +8,7 @@ func _enter_tree():
 	print("INIT")
 	if OS.has_feature("server"):
 		print("Hi!")
-		if not get_tree().change_scene("res://client/Client.tscn"):
+		if not get_tree().change_scene("res://server/Server.tscn"):
 			print("Error changing scene to Client")
 	else:
 		print("CLI")

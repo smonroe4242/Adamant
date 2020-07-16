@@ -42,10 +42,7 @@ remote func set_puppet_vars(p, v, a, l):
 	puppet_left_flip = l
 
 func _physics_process(_delta):
-	if get_tree().is_network_server():
-		# server replica code
-		rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip)
-	elif is_network_master():
+	if is_network_master():
 		# client og code
 		velocity.y += GRAV
 		if Input.is_action_pressed('ui_right'):

@@ -135,14 +135,10 @@ func drop_ladders():
 func smooth_noise():
 	for x in range(0, size - 1):
 		for y in range(0, size - 1):
-			if grid[x][y] > EMPTY and grid[x + 1][y] == EMPTY and grid[x+1][y + 1] > EMPTY:
+			if grid[x][y] == FILL and grid[x + 1][y] == EMPTY and grid[x+1][y + 1] == FILL:
 				grid[x + 1][y] = R_SLOPE
-			elif grid[x][y] == EMPTY and grid[x + 1][y] > EMPTY and grid[x][y + 1] > EMPTY:
+			elif grid[x][y] == EMPTY and grid[x + 1][y] == FILL and grid[x][y + 1] == FILL:
 				grid[x][y] = L_SLOPE
-#			if grid[x][y] == FILL and grid[x + 1][y] == EMPTY and grid[x+1][y + 1] == FILL:
-#				grid[x + 1][y] = R_SLOPE
-#			elif grid[x][y] == EMPTY and grid[x + 1][y] == FILL and grid[x][y + 1] == FILL:
-#				grid[x][y] = L_SLOPE
 # transform from integer grid to tilemap
 func place_tiles():
 	for x in size:
@@ -154,8 +150,9 @@ func place_tiles():
 					noise.set_cell(x, y, R_BIG)
 				else:
 					noise.set_cell(x, y, ROCK)
+			elif cell == L_SLOPE or cell == R_SLOPE:
+				noise.set_cell(x, y, cell)
 			else:
-#				noise.set_cell(x, y, cell)
 				noise.set_cell(x, y, (randi() & 7) + 10)
 
 ### End Level Genreation
