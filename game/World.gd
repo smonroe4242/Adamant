@@ -1,46 +1,37 @@
 extends Node2D
 const level = preload("res://game/NoiseLevel.tscn")
-const offset = Vector2(Global.chunk_offset, Global.chunk_offset)# second number is NoiseLevel.size
+const offset = Global.offsetv
 const size = Global.chunk_size
 var simplex = OpenSimplexNoise.new()
 var chunks = {}
 var origin = Vector2(0, 0)
 enum biome {SKY, OVERWORLD, CAVE}
-# initialize noise generator
-func _enter_tree():
-	make_noise()
 
-# get the chunk the player starts in
 func _ready():
-	gen_block(Vector2(int(origin.x / offset.x), int(origin.y / offset.y)))
+	make_noise()
+	respawn(origin)
 
 func respawn(rsp):
 	gen_block(Vector2(int(rsp.x / offset.x), int(rsp.y / offset.y)))
-var notes = """
-clients get monster puppets
-monster base logic happens on server side and rpc's to clients puppets
-"""
+
 # initialize OpenSimplexNoise parameters
 func make_noise():
-	print("world entered tree")
-	simplex.seed = 13
-	simplex.lacunarity = 2.0
-	simplex.octaves = 1
-	simplex.period = 10.0
-	simplex.persistence = 1
+	simplex.set_seed(13)
+	simplex.set_lacunarity(2.0)
+	simplex.set_octaves(1)
+	simplex.set_period(10.0)
+	simplex.set_persistence(1)
 
 func gen_chunk(v):
 	if v in chunks.keys():
 		return
 	var lvl = level.instance()
 	lvl.type = biome.OVERWORLD if v.y == 0 else biome.CAVE if v.y > 0 else biome.SKY
-	print("Gen  chunk")
 	lvl.position = v * offset
 	lvl.coords = v
 	lvl.ref = v * Vector2(size, size)
 	lvl.size = size
 	lvl.simplex = simplex
-	lvl.connect("player_entered", self, "player_entered")
 	chunks[v] = lvl
 	call_deferred("add_child", lvl)
 
@@ -96,9 +87,8 @@ func gen_block(v):
 	var block = get_borderv(v)
 	for chunk in block:
 		gen_chunk(chunk)
-	var big_block = get_big_borderv(v)
 	for chunk in chunks.keys():
-		if not chunk in big_block:
+		if not chunk in block:
 			kill_chunk(chunk)
 
 func player_entered(coords):

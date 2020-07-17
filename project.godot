@@ -91,6 +91,13 @@ block={
  ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Environment"
+2d_physics/layer_2="Chunks"
+2d_physics/layer_3="Damage"
+2d_physics/layer_5="Player"
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

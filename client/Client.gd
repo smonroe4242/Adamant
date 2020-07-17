@@ -6,7 +6,7 @@ func _enter_tree():
 func init_client():
 	print("CLIENT")
 	var tree = get_tree()
-	tree.set_debug_collisions_hint(false)
+#	tree.set_debug_collisions_hint(true)
 	var peer = NetworkedMultiplayerENet.new()
 	tree.connect("connected_to_server", self, "_server_connect")
 	tree.connect("connection_failed", self, "_server_connect_fail")
@@ -57,6 +57,7 @@ remote func load_player(id, username, origin):
 	if selfId == id: # owning client
 		this_player.set_network_master(id)
 		this_player.get_node("Camera2D").current = true
+		this_player.connect("player_entered", get_node("./World"), "player_entered")
 		Global.player_node = this_player
 	else: # client replica
 		this_player.set_network_master(1)

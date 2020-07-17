@@ -1,4 +1,4 @@
-[gd_scene load_steps=130 format=2]
+[gd_scene load_steps=129 format=2]
 
 [ext_resource path="res://game/Player.gd" type="Script" id=1]
 [ext_resource path="res://assets/Knight/noBKG_KnightIdle_strip.png" type="Texture" id=2]
@@ -147,15 +147,15 @@ region = Rect2( 2880, 0, 144, 64 )
 atlas = ExtResource( 4 )
 region = Rect2( 3024, 0, 144, 64 )
 
-[sub_resource type="AtlasTexture" id=134]
+[sub_resource type="AtlasTexture" id=35]
 atlas = ExtResource( 11 )
 region = Rect2( 256, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=135]
+[sub_resource type="AtlasTexture" id=36]
 atlas = ExtResource( 11 )
 region = Rect2( 320, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=136]
+[sub_resource type="AtlasTexture" id=37]
 atlas = ExtResource( 11 )
 region = Rect2( 448, 0, 64, 64 )
 
@@ -219,79 +219,79 @@ region = Rect2( 1248, 0, 96, 64 )
 atlas = ExtResource( 6 )
 region = Rect2( 1344, 0, 96, 64 )
 
-[sub_resource type="AtlasTexture" id=137]
+[sub_resource type="AtlasTexture" id=53]
 atlas = ExtResource( 11 )
 region = Rect2( 576, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=138]
+[sub_resource type="AtlasTexture" id=54]
 atlas = ExtResource( 11 )
 region = Rect2( 640, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=139]
+[sub_resource type="AtlasTexture" id=55]
 atlas = ExtResource( 11 )
 region = Rect2( 704, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=140]
+[sub_resource type="AtlasTexture" id=56]
 atlas = ExtResource( 11 )
 region = Rect2( 768, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=141]
+[sub_resource type="AtlasTexture" id=57]
 atlas = ExtResource( 11 )
 region = Rect2( 832, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=120]
+[sub_resource type="AtlasTexture" id=58]
 atlas = ExtResource( 11 )
 region = Rect2( 0, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=121]
+[sub_resource type="AtlasTexture" id=59]
 atlas = ExtResource( 11 )
 region = Rect2( 64, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=122]
+[sub_resource type="AtlasTexture" id=60]
 atlas = ExtResource( 11 )
 region = Rect2( 128, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=123]
+[sub_resource type="AtlasTexture" id=61]
 atlas = ExtResource( 11 )
 region = Rect2( 192, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=124]
+[sub_resource type="AtlasTexture" id=62]
 atlas = ExtResource( 11 )
 region = Rect2( 256, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=125]
+[sub_resource type="AtlasTexture" id=63]
 atlas = ExtResource( 11 )
 region = Rect2( 320, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=126]
+[sub_resource type="AtlasTexture" id=64]
 atlas = ExtResource( 11 )
 region = Rect2( 384, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=127]
+[sub_resource type="AtlasTexture" id=65]
 atlas = ExtResource( 11 )
 region = Rect2( 448, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=128]
+[sub_resource type="AtlasTexture" id=66]
 atlas = ExtResource( 11 )
 region = Rect2( 512, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=129]
+[sub_resource type="AtlasTexture" id=67]
 atlas = ExtResource( 11 )
 region = Rect2( 576, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=130]
+[sub_resource type="AtlasTexture" id=68]
 atlas = ExtResource( 11 )
 region = Rect2( 640, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=131]
+[sub_resource type="AtlasTexture" id=69]
 atlas = ExtResource( 11 )
 region = Rect2( 704, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=132]
+[sub_resource type="AtlasTexture" id=70]
 atlas = ExtResource( 11 )
 region = Rect2( 768, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=133]
+[sub_resource type="AtlasTexture" id=71]
 atlas = ExtResource( 11 )
 region = Rect2( 832, 0, 64, 64 )
 
@@ -479,7 +479,7 @@ animations = [ {
 "name": "attack",
 "speed": 15.0
 }, {
-"frames": [ SubResource( 134 ), SubResource( 135 ), SubResource( 136 ) ],
+"frames": [ SubResource( 35 ), SubResource( 36 ), SubResource( 37 ) ],
 "loop": false,
 "name": "jump_start",
 "speed": 15.0
@@ -489,12 +489,12 @@ animations = [ {
 "name": "death",
 "speed": 7.0
 }, {
-"frames": [ SubResource( 137 ), SubResource( 138 ), SubResource( 139 ), SubResource( 140 ), SubResource( 141 ) ],
+"frames": [ SubResource( 53 ), SubResource( 54 ), SubResource( 55 ), SubResource( 56 ), SubResource( 57 ) ],
 "loop": false,
 "name": "jump_end",
 "speed": 15.0
 }, {
-"frames": [ SubResource( 120 ), SubResource( 121 ), SubResource( 122 ), SubResource( 123 ), SubResource( 124 ), SubResource( 125 ), SubResource( 126 ), SubResource( 127 ), SubResource( 128 ), SubResource( 129 ), SubResource( 130 ), SubResource( 131 ), SubResource( 132 ), SubResource( 133 ) ],
+"frames": [ SubResource( 58 ), SubResource( 59 ), SubResource( 60 ), SubResource( 61 ), SubResource( 62 ), SubResource( 63 ), SubResource( 64 ), SubResource( 65 ), SubResource( 66 ), SubResource( 67 ), SubResource( 68 ), SubResource( 69 ), SubResource( 70 ), SubResource( 71 ) ],
 "loop": false,
 "name": "jump",
 "speed": 15.0
@@ -537,13 +537,12 @@ size = 48
 font_data = ExtResource( 9 )
 
 [sub_resource type="RectangleShape2D" id=118]
-
-[sub_resource type="RectangleShape2D" id=119]
-extents = Vector2( 0.001, 0.001 )
+extents = Vector2( 57, 8 )
 
 [node name="KinematicBody2D" type="KinematicBody2D"]
 z_index = 10
 collision_layer = 16
+collision_mask = 5
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_lock_": true
@@ -552,8 +551,8 @@ __meta__ = {
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 4, 4 )
 frames = SubResource( 115 )
-animation = "death"
-frame = 14
+animation = "attack_1"
+frame = 3
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -580,16 +579,10 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Area2D" type="Area2D" parent="."]
-position = Vector2( -1, 0 )
-collision_layer = 2
-collision_mask = 2
+[node name="Sword" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2147483664
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2( 48, 0 )
-scale = Vector2( 8, 6 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sword"]
+position = Vector2( 59, -24 )
 shape = SubResource( 118 )
-
-[node name="ChunkCollider" type="CollisionShape2D" parent="Area2D"]
-position = Vector2( -3, -4 )
-shape = SubResource( 119 )

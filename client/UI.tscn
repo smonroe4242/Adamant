@@ -25,3 +25,4 @@ text = "Leave"
 
 [node name="Node2D" parent="." instance=ExtResource( 2 )]
 position = Vector2( 197.322, 73.761 )
+[connection signal="pressed" from="CanvasLayer/TopBar/LeaveButton" to="CanvasLayer/TopBar" method="_on_LeaveButton_pressed"]

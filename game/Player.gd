@@ -8,6 +8,7 @@ master var animation := "idle"
 master var left_flip := false
 master var hp := 100
 master var max_hp = 100
+var coords
 var respawn := Vector2(10, 10)
 var jumping := false
 var snap := Vector2(0, 16)
@@ -21,7 +22,7 @@ puppet var puppet_hp := 100
 puppet var puppet_max_hp := 100
 onready var sprite = $AnimatedSprite
 onready var label = $Label
-onready var hitbox = $Area2D
+onready var sword = $Sword
 var attack_phase = 0
 var attacking = false
 var blocking = false
@@ -30,8 +31,10 @@ var attack_timer = Timer.new()
 const ATK_TIME = 0.5
 var death_timer = Timer.new()
 const DEATH_TIME = 2.1 # Length of death animation, so we see the whole thing before respawning
+signal player_entered
 
 func _ready():
+	coords = position / Global.offsetv
 	puppet_position = position
 	puppet_animation = animation
 	puppet_left_flip = left_flip
@@ -73,9 +76,9 @@ func swing():
 		var ids = []
 		swung = true
 		if is_network_master():
-			for b in hitbox.get_overlapping_areas():
+			for b in sword.get_overlapping_areas():
 				if b.get_parent().has_method("damage"):
-					print(b.name)
+#					print(b.name)
 					ids.append(b.get_parent().name)
 		rpc_id(1, "request_damage", ids)
 	pass
@@ -166,24 +169,30 @@ func _physics_process(_delta):
 	velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 4, rad2deg(90))
 	if not is_network_master():
 		puppet_position = position
+	else:
+		var new_coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
+		if new_coords != coords:
+			print("moved chunk ", new_coords)
+			coords = new_coords
+			emit_signal("player_entered", coords)
 
 func set_display_name(user):
 	displayName = user
 
 remote func damage(amt):
-	print(name, " damaged (", str(hp - amt), ")", str(get_tree().get_network_unique_id()))
+#	print(name, " damaged (", str(hp - amt), ")", str(get_tree().get_network_unique_id()))
 	hp -= amt
 	if hp <= 0:
 		die()
 
 func die():
-	print("Client: DEAD")
+#	print("Client: DEAD")
 	hp = 0
 	animation = "death"
 	death_timer.start()
 
 func respawn():
-	print("Client: RESPAWN")
+#	print("Client: RESPAWN")
 	death_timer.stop()
 	position = respawn
 	hp = max_hp
