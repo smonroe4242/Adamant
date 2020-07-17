@@ -1,6 +1,5 @@
 extends KinematicBody2D
 
-#const UP = Vector2(0, -1)
 const GRAV = 20
 const STEP = 450
 const JUMP = 500
@@ -9,6 +8,7 @@ master var animation := "idle"
 master var left_flip := false
 master var hp := 100
 master var max_hp = 100
+var respawn := Vector2(10, 10)
 var jumping := false
 var snap := Vector2(0, 16)
 var onLadder := int(0)
@@ -26,7 +26,10 @@ var attack_phase = 0
 var attacking = false
 var blocking = false
 var swung = false
-var attack_timer = null
+var attack_timer = Timer.new()
+const ATK_TIME = 0.5
+var death_timer = Timer.new()
+const DEATH_TIME = 2.1 # Length of death animation, so we see the whole thing before respawning
 
 func _ready():
 	puppet_position = position
@@ -34,10 +37,12 @@ func _ready():
 	puppet_left_flip = left_flip
 	puppet_hp = hp
 	label.text = displayName
-	attack_timer = Timer.new()
-	add_child(attack_timer)
-	attack_timer.set_wait_time(0.5)
+	attack_timer.set_wait_time(ATK_TIME)
 	attack_timer.connect("timeout", self, "_attack_finish")
+	add_child(attack_timer)
+	death_timer.set_wait_time(DEATH_TIME)
+	death_timer.connect("timeout", self, "respawn")
+	add_child(death_timer)
 
 # unsafe because network ownership is not checked
 # but we had an error with it so come back when we understand
@@ -67,11 +72,8 @@ func swing():
 	if (swung != true):
 		var ids = []
 		swung = true
-		print("Swing()")
 		if is_network_master():
 			for b in hitbox.get_overlapping_areas():
-				print("B: ", b.name)
-				print("P:   ", b.get_parent().name)
 				if b.get_parent().has_method("damage"):
 					print(b.name)
 					ids.append(b.get_parent().name)
@@ -83,7 +85,6 @@ func attack():
 	swung = false
 	if attack_phase == 0:
 		attack_phase += 1
-		print("attack")
 		if sprite.frame == 3 and animation == "attack_1":
 			sprite.set_frame(0)
 		animation = "attack_1"
@@ -91,65 +92,63 @@ func attack():
 	pass
 
 func _physics_process(_delta):
-	if is_network_master() and hp > 0:
-		# client og code
-		if (animation == "attack_1") and sprite.frame == 2:
-			swing()
-		velocity.y += GRAV
-		if Input.is_action_pressed('block') and attacking != true:
-			animation = "block"
-			blocking = true
-			if is_on_floor():
-				velocity.x = 0
-				velocity.y = 0
-		elif Input.is_action_just_released('block'):
-			blocking = false
-			animation = "idle"
-		elif Input.is_action_pressed('attack'):
-			attacking = true
-		elif Input.is_action_pressed('ui_right') and !attacking:
-			velocity.x = STEP
-			if is_on_floor():
-				animation = "run"
-			left_flip = false
-		elif Input.is_action_pressed('ui_left') and !attacking:
-			velocity.x = -STEP
-			if is_on_floor():
-				animation = "run"
-			left_flip = true
-		else:
-			velocity.x = 0
-			if is_on_floor() and attack_phase == 0:
+	if is_network_master():
+		if hp > 0:
+			# client og code
+			if (animation == "attack_1") and sprite.frame == 2:
+				swing()
+			velocity.y += GRAV
+			if Input.is_action_pressed('block') and attacking != true:
+				animation = "block"
+				blocking = true
+				if is_on_floor():
+					velocity.x = 0
+					velocity.y = 0
+			elif Input.is_action_just_released('block'):
+				blocking = false
 				animation = "idle"
+			elif Input.is_action_pressed('attack'):
+				attacking = true
+			elif Input.is_action_pressed('ui_right') and !attacking:
+				velocity.x = STEP
+				if is_on_floor():
+					animation = "run"
+				left_flip = false
+			elif Input.is_action_pressed('ui_left') and !attacking:
+				velocity.x = -STEP
+				if is_on_floor():
+					animation = "run"
+				left_flip = true
+			else:
+				velocity.x = 0
+				if is_on_floor() and attack_phase == 0:
+					animation = "idle"
 
-		if attacking == true and attack_phase == 0:
-			attack()
-		if (attacking == true or attack_phase > 0) and is_on_floor():
-			velocity.x = 0
+			if attacking == true and attack_phase == 0:
+				attack()
+			if (attacking == true or attack_phase > 0) and is_on_floor():
+				velocity.x = 0
 
-		if onLadder == 0:
-			if is_on_floor():
+			if onLadder == 0:
+				if is_on_floor():
+					if Input.is_action_pressed('ui_up'):
+						velocity.y = -STEP
+						animation = "jump_start"
+						jumping = true
+						snap = Vector2(0, 0)
+					elif jumping == true:
+						animation = "jump_end"
+						jumping = false
+						snap = Vector2(0, 16)
+			else:
+				animation = "idle"
+				velocity.y = 0
 				if Input.is_action_pressed('ui_up'):
 					velocity.y = -STEP
-					animation = "jump_start"
-					jumping = true
-					snap = Vector2(0, 0)
-				elif jumping == true:
-					animation = "jump_end"
-					jumping = false
-					snap = Vector2(0, 16)
-		else:
-			animation = "idle"
-			velocity.y = 0
-			if Input.is_action_pressed('ui_up'):
-				velocity.y = -STEP
-			elif Input.is_action_pressed('ui_down'):
-				velocity.y = STEP
-		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, hp)
-	elif hp <= 0:
-		animation = "death"
-#		position = Vector2(10, 10)
-#		rpc_id(1, "set_vars", position, velocity, animation, left_flip, hp)
+				elif Input.is_action_pressed('ui_down'):
+					velocity.y = STEP
+			rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, hp)
+	#		rpc_id(1, "set_vars", position, velocity, animation, left_flip, hp)
 	else:
 		#client replica code
 		set_vars(
@@ -174,8 +173,19 @@ func set_display_name(user):
 remote func damage(amt):
 	print(name, " damaged (", str(hp - amt), ")", str(get_tree().get_network_unique_id()))
 	hp -= amt
+	if hp <= 0:
+		die()
 
-remote func die():
+func die():
 	print("Client: DEAD")
 	hp = 0
 	animation = "death"
+	death_timer.start()
+
+func respawn():
+	print("Client: RESPAWN")
+	death_timer.stop()
+	position = respawn
+	hp = max_hp
+	if is_network_master():
+		get_parent().respawn(respawn)

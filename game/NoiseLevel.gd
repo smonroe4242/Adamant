@@ -3,12 +3,13 @@ class_name NoiseLevel
 
 var ladder = preload("res://game/Ladder.tscn")
 var grid = []
-var coords = Vector2()
+enum biome {SKY, OVERWORLD, CAVE}
+# Set by parent
+var coords
 var simplex
 var size
 var ref
 var type
-enum biome {SKY, OVERWORLD, CAVE}
 # Auto Tile Consts
 const EMPTY = 0
 const FILL = 1
@@ -21,30 +22,21 @@ const LADDER = 7
 ## TODO make tiles bitmaskable
 # autotile sets need to be adjusted for this, coop with nothawthorne
 onready var noise = $Noise
-#onready var BG = $BG
+onready var collision = $Area2D/CollisionShape2D
 onready var nav = $Nav
 
-# initialize object
-func _enter_tree():
-# warning-ignore:unsafe_property_access
-	$Area2D/CollisionShape2D.disabled = true
-# warning-ignore:unsafe_property_access
-	size = get_parent().size
-	ref = coords * Vector2(size, size)
-# warning-ignore:unsafe_property_access
-	simplex = get_parent().simplex
-# then
 # apply procgen layers to create traversable map
 func _ready():
 	print("Chunk ready of type ", type)
+	collision.disabled = true
 	if type == biome.CAVE:
 		gen_cave()
 	elif type == biome.OVERWORLD:
 		gen_overworld()
 	elif type == biome.SKY:
 		gen_skies()
-# warning-ignore:unsafe_property_access
-	$Area2D/CollisionShape2D.disabled = false
+	collision.disabled = false
+
 ### Start Sky Gen
 func gen_skies():
 	pass
@@ -69,50 +61,56 @@ func make_bottom():
 				pass
 			noise.set_cell(x, y, 10)
 
-
 ### Level Generation
 func gen_cave():
 	make_grid()
+#	clear_paths()
 	drop_ladders()
 	smooth_noise()
 	place_tiles()
 # create bitmap from simplex noise floats
 func make_grid():
-	grid.resize(size + 1)
+	grid.resize(size)
 	for x in size:
 		grid[x] = []
-		grid[x].resize(size+1)
+		grid[x].resize(size)
 		for y in size:
 			grid[x][y] = EMPTY if simplex.get_noise_2dv(ref + Vector2(x, y)) < 0 else FILL
 
 # TODO [fix bsq] find thin walls to make in to caves
-#func clear_paths():
-#	var bsq = []
-#	var maxsize = -1
-#	var mx = 0
-#	var my = 0
-#	bsq.resize(size + 1)
-#	for x in size:
-#		bsq[x] = []
-#		bsq[x].resize(size + 1)
-#		for y in size:
-#			bsq[x][y] = grid[x][y]
-#	for x in range(1, size):
-#		for y in range(1, size):
-#			if grid[x][y] == 1:
-#				bsq[x][y] = 1 + min(bsq[x][y - 1], min(bsq[x - 1][y], bsq[x - 1][y - 1]))
-#			if maxsize < bsq[x][y]:
-#				maxsize = bsq[x][y]
-#				mx = x
-#				my = y
-#			else:
-#				bsq[x][y] = 0
-#	for x in size:
-#		for y in size:
-#			if bsq[x][y] == maxsize - 1:
-#				for i in range(x, mx, -1):
-#					for j in range(y, my, -1):
-#						grid[i][j] = LADDER
+func clear_paths():
+	var bsq = []
+	var maxsize = -1
+	var mx = 0
+	var my = 0
+	bsq.resize(size)
+	for x in size:
+		bsq[x] = []
+		bsq[x].resize(size)
+	for x in size:
+		bsq[x][0] = grid[x][0]
+	for y in size:
+		bsq[0][y] = grid[0][y]
+	for x in range(1, size):
+		for y in range(1, size):
+			if grid[x][y] == 1:
+				bsq[x][y] = 1 + min(bsq[x][y - 1], min(bsq[x - 1][y], bsq[x - 1][y - 1]))
+			else:
+				bsq[x][y] = 0
+			if maxsize < bsq[x][y]:
+				maxsize = bsq[x][y]
+				mx = x
+				my = y
+	for x in maxsize:
+		for y in maxsize:
+			grid[mx - x][my - y] = R_SLOPE
+	var msz = 3
+	for x in range(1, size):
+		for y in range(1, size):
+			if bsq[x][x] == msz and bsq[x - 1][y] == msz - 1 and bsq[x][y - 1] == msz - 1 and bsq[x-1][y-1] == msz - 1:
+				for i in msz:
+					for j in msz:
+						grid[x - i][y - j] = L_SLOPE
 # create Ladder objects at unjumpable overhangs
 func drop_ladders():
 	for x in range(1, size - 1):

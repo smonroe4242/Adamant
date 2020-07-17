@@ -12,8 +12,14 @@ func _enter_tree():
 
 # get the chunk the player starts in
 func _ready():
-	gen_chunk(Vector2(int(origin.x / offset.x), int(origin.y / offset.y)))
+	gen_block(Vector2(int(origin.x / offset.x), int(origin.y / offset.y)))
 
+func respawn(rsp):
+	gen_block(Vector2(int(rsp.x / offset.x), int(rsp.y / offset.y)))
+var notes = """
+clients get monster puppets
+monster base logic happens on server side and rpc's to clients puppets
+"""
 # initialize OpenSimplexNoise parameters
 func make_noise():
 	print("world entered tree")
@@ -31,6 +37,9 @@ func gen_chunk(v):
 	print("Gen  chunk")
 	lvl.position = v * offset
 	lvl.coords = v
+	lvl.ref = v * Vector2(size, size)
+	lvl.size = size
+	lvl.simplex = simplex
 	lvl.connect("player_entered", self, "player_entered")
 	chunks[v] = lvl
 	call_deferred("add_child", lvl)
@@ -54,13 +63,44 @@ func get_borderv(v):
 		v + Vector2.DOWN + Vector2.RIGHT,
 		]
 
+func get_big_borderv(v):
+	return [
+		v,
+		v + Vector2.UP,
+		v + Vector2.UP + Vector2.UP,
+		v + Vector2.UP + Vector2.UP + Vector2.LEFT,
+		v + Vector2.UP + Vector2.UP + Vector2.LEFT + Vector2.LEFT,
+		v + Vector2.UP + Vector2.UP + Vector2.RIGHT,
+		v + Vector2.UP + Vector2.UP + Vector2.RIGHT + Vector2.RIGHT,
+		v + Vector2.DOWN,
+		v + Vector2.DOWN + Vector2.DOWN,
+		v + Vector2.DOWN + Vector2.DOWN + Vector2.LEFT,
+		v + Vector2.DOWN + Vector2.DOWN + Vector2.LEFT + Vector2.LEFT,
+		v + Vector2.DOWN + Vector2.DOWN + Vector2.RIGHT,
+		v + Vector2.DOWN + Vector2.DOWN + Vector2.RIGHT + Vector2.RIGHT,
+		v + Vector2.LEFT,
+		v + Vector2.LEFT + Vector2.LEFT,
+		v + Vector2.LEFT + Vector2.LEFT + Vector2.UP,
+		v + Vector2.LEFT + Vector2.LEFT + Vector2.DOWN,
+		v + Vector2.RIGHT,
+		v + Vector2.RIGHT + Vector2.RIGHT,
+		v + Vector2.RIGHT + Vector2.RIGHT + Vector2.UP,
+		v + Vector2.RIGHT + Vector2.RIGHT + Vector2.DOWN,
+		v + Vector2.UP + Vector2.LEFT,
+		v + Vector2.UP + Vector2.RIGHT,
+		v + Vector2.DOWN + Vector2.LEFT,
+		v + Vector2.DOWN + Vector2.RIGHT,
+		]
+
 func gen_block(v):
 	var block = get_borderv(v)
 	for chunk in block:
 		gen_chunk(chunk)
+	var big_block = get_big_borderv(v)
 	for chunk in chunks.keys():
-		if not chunk in block:
+		if not chunk in big_block:
 			kill_chunk(chunk)
 
 func player_entered(coords):
+	rpc_id(1, "update_player_coords", coords)
 	gen_block(coords)

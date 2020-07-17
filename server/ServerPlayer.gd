@@ -28,22 +28,13 @@ remote func request_damage(targets):
 	var parent = get_parent()
 	# a naively trusting damage calculation
 	for target in targets:
-		print(target)
 		var t = parent.get_node(str(target))
-		if t == null:
-			print("bad")
-			continue
-		else:
-			print(t.name)
+		if not t == null:
 			t.damage(30)
-			if t.hp < 0:
-				rpc_id(int(target), "die")
 
-remote func damage(amt):
+func damage(amt):
 	if (hp - amt <= 0):
-		print("DEATH")
 		rpc("damage", hp)
-		rpc("die")
 	else:
 		rpc("damage", amt)
 
