@@ -20,6 +20,7 @@ puppet var puppet_animation := "idle"
 puppet var puppet_left_flip := false
 puppet var puppet_hp := 100
 puppet var puppet_max_hp := 100
+puppet var puppet_coords
 onready var sprite = $AnimatedSprite
 onready var label = $Label
 onready var sword = $Sword
@@ -39,6 +40,7 @@ func _ready():
 	puppet_animation = animation
 	puppet_left_flip = left_flip
 	puppet_hp = hp
+	puppet_coords = coords
 	label.text = displayName
 	attack_timer.set_wait_time(ATK_TIME)
 	attack_timer.connect("timeout", self, "_attack_finish")
@@ -51,19 +53,21 @@ func _ready():
 # but we had an error with it so come back when we understand
 # godot networking better
 ### TODO master and pupper
-remote func set_vars(p, v, a, l, h):
+remote func set_vars(p, v, a, l, h, c):
 	position = p
 	velocity = v
 	animation = a
 	left_flip = l
 	hp = h
+	coords = c
 
-remote func set_puppet_vars(p, v, a, l, h):
+remote func set_puppet_vars(p, v, a, l, h, c):
 	puppet_position = p
 	puppet_velocity = v
 	puppet_animation = a
 	puppet_left_flip = l
 	puppet_hp = h
+	puppet_coords = c
 
 func _attack_finish():
 	attack_phase = 0
@@ -150,7 +154,7 @@ func _physics_process(_delta):
 					velocity.y = -STEP
 				elif Input.is_action_pressed('ui_down'):
 					velocity.y = STEP
-			rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, hp)
+			rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, hp, coords)
 	#		rpc_id(1, "set_vars", position, velocity, animation, left_flip, hp)
 	else:
 		#client replica code
@@ -159,7 +163,8 @@ func _physics_process(_delta):
 			puppet_velocity,
 			puppet_animation,
 			puppet_left_flip,
-			puppet_hp)
+			puppet_hp,
+			puppet_coords)
 
 # warning-ignore:unsafe_method_access
 	sprite.set_flip_h(left_flip)
@@ -173,8 +178,8 @@ func _physics_process(_delta):
 		var new_coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
 		if new_coords != coords:
 			print("moved chunk ", new_coords)
+			emit_signal("player_entered", coords, new_coords, displayName)
 			coords = new_coords
-			emit_signal("player_entered", coords)
 
 func set_display_name(user):
 	displayName = user
