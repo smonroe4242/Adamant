@@ -1,8 +1,19 @@
 extends Node2D
 
 const MAX_PLAYERS = 200
+# Holds all players who have ever logged in
+# players = { str: { int, Vector2 } }
+# players[username] = {'passwd': hash(passwd), 'spawn': Vector2(0, 0)}
 var players := {}
+# Holds all players currently logged in
+# current = { int: { int, str, Vector2 } }
+# current[id] = {'id': id, 'name': username, 'spawn': players[username].spawn}
 var current := {}
+# Holds all players coordinates
+# actor_map = { Vector2: { int: { int, str } } }
+# actor_map[Vector2(0, 0)][12345] = {id: 12345, user: "Player1"}
+var actor_map := {}
+
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
 	init_server()
@@ -31,6 +42,7 @@ func _client_disconnect(id):
 		print("Not a node in tree")
 		return
 	players[current[id].name].spawn = deadClient.position
+	get_node("./World").remove_dead_actor(deadClient.coords, id)
 # warning-ignore:return_value_discarded
 	current.erase(id)
 	for i in current:
@@ -42,8 +54,7 @@ func _client_disconnect(id):
 func validate_user(id, user, passwd):
 	if players[user] == null:
 		print("Server: New Player: ", user, " as ", id)
-		players[user] = {'passwd': hash(passwd), 'spawn': Vector2(512, 512)}
-		print("Testing only: ", passwd, " hashes to ", hash(passwd))
+		players[user] = {'passwd': hash(passwd), 'spawn': Vector2(0, 0)}
 	else:
 		print("Server: Old Player: ", user, " as ", id)
 		if players[user].passwd != hash(passwd):
@@ -59,9 +70,6 @@ remote func server_validate_login(id, user, passwd):
 		load_player_server(id, user, players[user].spawn)
 		rpc_id(id, "load_world", players[user].spawn)
 		rpc_id(id, "load_player", id, user, players[user].spawn)
-		for i in current.keys():
-			rpc_id(i, "load_player", id, user, players[user].spawn)
-			rpc_id(id, "load_player", i, current[i].name, current[i].spawn)
 		current[id] = {'id': id, 'name': user, 'spawn': players[user].spawn}
 
 func load_world_server():
@@ -76,4 +84,6 @@ func load_player_server(id, username, origin):
 	this_player.set_name(str(id))
 	this_player.position = origin
 	this_player.set_network_master(id)
-	get_node("./World").call_deferred("add_child", this_player)
+	var world = get_node("./World")
+	world.actor_map = actor_map
+	world.call_deferred("add_child", this_player)
