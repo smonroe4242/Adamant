@@ -3,17 +3,20 @@ extends Control
 onready var server = $CanvasLayer/CenterContainer/GridContainer/server
 onready var user = $CanvasLayer/CenterContainer/GridContainer/user
 onready var passwd = $CanvasLayer/CenterContainer/GridContainer/passwd
+onready var error = $CanvasLayer/CenterContainer/GridContainer/Error
 
+func _ready():
+	server.text = "127.0.0.1"
+	user.text = Global.username
+	passwd.text = ""
+	error.text = Global.error
 
 func _on_Button_pressed():
-# warning-ignore:unsafe_property_access
-	Global.server_ip = IP.resolve_hostname(server.text, 1)
-# warning-ignore:unsafe_property_access
-# warning-ignore:unsafe_property_access
+	var ip = IP.resolve_hostname(server.text, 1)
+	print("Login: resolve_hostname(): ", ip)
+	Global.server_ip = ip
 	print(server.text, ":", Global.server_ip)
-# warning-ignore:unsafe_property_access
 	Global.username = user.text
-# warning-ignore:unsafe_property_access
 	Global.password = passwd.text
 	if get_tree().change_scene("res://client/Client.tscn"):
 		print("Error changing to Client scene")

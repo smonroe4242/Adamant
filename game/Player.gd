@@ -8,7 +8,7 @@ master var animation := "idle"
 master var left_flip := false
 master var hp := 100
 master var max_hp = 100
-var coords
+var coords = null
 var respawn := Vector2(10, 10)
 var jumping := false
 var snap := Vector2(0, 16)
@@ -19,7 +19,7 @@ puppet var puppet_velocity := Vector2()
 puppet var puppet_animation := "idle"
 puppet var puppet_left_flip := false
 puppet var puppet_hp := 100
-puppet var puppet_max_hp := 100
+#puppet var puppet_max_hp := 100
 puppet var puppet_coords
 onready var sprite = $AnimatedSprite
 onready var label = $Label
@@ -35,7 +35,8 @@ const DEATH_TIME = 2.1 # Length of death animation, so we see the whole thing be
 signal player_entered
 
 func _ready():
-	coords = position / Global.offsetv
+	if is_network_master():
+		update_coords()
 	puppet_position = position
 	puppet_animation = animation
 	puppet_left_flip = left_flip
@@ -104,7 +105,6 @@ func _physics_process(_delta):
 			# client og code
 			if (animation == "attack_1") and sprite.frame == 2:
 				swing()
-			velocity.y += GRAV
 			if Input.is_action_pressed('block') and attacking != true:
 				animation = "block"
 				blocking = true
@@ -147,6 +147,8 @@ func _physics_process(_delta):
 						animation = "jump_end"
 						jumping = false
 						snap = Vector2(0, 16)
+				else:
+					velocity.y += GRAV
 			else:
 				animation = "idle"
 				velocity.y = 0
@@ -175,11 +177,14 @@ func _physics_process(_delta):
 	if not is_network_master():
 		puppet_position = position
 	else:
-		var new_coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
-		if new_coords != coords:
-			print("moved chunk ", new_coords)
-			emit_signal("player_entered", coords, new_coords, displayName)
-			coords = new_coords
+		update_coords()
+
+func update_coords():
+	var new_coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
+	if new_coords != coords:
+		print("moved chunk ", new_coords)
+		emit_signal("player_entered", coords, new_coords, displayName)
+		coords = new_coords
 
 func set_display_name(user):
 	displayName = user
@@ -201,5 +206,6 @@ func respawn():
 	death_timer.stop()
 	position = respawn
 	hp = max_hp
+	update_coords()
 	if is_network_master():
 		get_parent().respawn(respawn)

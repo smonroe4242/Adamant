@@ -28,6 +28,7 @@ _global_script_class_icons={
 
 config/name="AdamantServer"
 run/main_scene="res://Entry.tscn"
+boot_splash/bg_color=Color( 0.109804, 0.2, 0.360784, 1 )
 config/icon="res://assets/icon.png"
 
 [autoload]
@@ -98,6 +99,11 @@ block={
 2d_physics/layer_3="Damage"
 2d_physics/layer_5="Player"
 
+[network]
+
+limits/tcp/connect_timeout_seconds=10
+
 [rendering]
 
+environment/default_clear_color=Color( 0.121569, 0.172549, 0.352941, 1 )
 environment/default_environment="res://default_env.tres"

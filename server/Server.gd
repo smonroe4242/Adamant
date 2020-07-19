@@ -34,34 +34,40 @@ func _client_connect(id):
 
 func _client_disconnect(id):
 	print("Server: Client ", str(id), " left")
-	if current[id] == null:
+	if current.get(id) == null:
 		print("Not a current player")
 		return
+	var c = current[id]
+	if not current.erase(id):
+		print("erase(id): not erased")
+	else:
+		print("erase(id) erased")
 	var deadClient = get_node("./World/" + str(id))
 	if deadClient == null:
 		print("Not a node in tree")
 		return
-	players[current[id].name].spawn = deadClient.position
+	players[c.name].spawn = deadClient.position
+# warning-ignore:unsafe_method_access
 	get_node("./World").remove_dead_actor(deadClient.coords, id)
-# warning-ignore:return_value_discarded
-	current.erase(id)
+	deadClient.queue_free()
 	for i in current:
 		rpc_id(i, "remove_player", id)
 	print("Server: removing player ", id)
-	if not deadClient == null:
-		deadClient.queue_free()
 
 func validate_user(id, user, passwd):
-	if players[user] == null:
+	if players.get(user) == null:
 		print("Server: New Player: ", user, " as ", id)
 		players[user] = {'passwd': hash(passwd), 'spawn': Vector2(0, 0)}
 	else:
-		print("Server: Old Player: ", user, " as ", id)
+		if not current.get(user) == null:
+			print("Server: ", user, " is attempting to log in twice")
+			rpc_id(id, "client_login_failed", "You can't log in twice")
+			return false
 		if players[user].passwd != hash(passwd):
 			print("Server: Bad login")
-			rpc_id(id, "client_login_failed", "username and password do not match")
+			rpc_id(id, "client_login_failed", "Invalid username or passrod")
 			return false
-	print("Server: Succesful Login")
+	print("Server: Succesful Login for ", user)
 	return true
 
 remote func server_validate_login(id, user, passwd):

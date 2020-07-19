@@ -44,12 +44,7 @@ func damage(amt):
 		rpc("damage", amt)
 
 func _physics_process(_delta):
-	# server replica code
 	var new_coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
 	if new_coords != coords:
-#		print("moved chunk ", new_coords)
 		coords = new_coords
 	rpc_unreliable("set_puppet_vars", position, velocity, animation, left_flip, hp, coords)
-
-	if not is_network_master():
-		puppet_position = position

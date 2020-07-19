@@ -127,6 +127,7 @@ func drop_ladders():
 				var sprite = lad.get_node("Sprite")
 				sprite.set_region(true)
 				sprite.set_region_rect(Rect2(Vector2(0, 0), Vector2(64, 64 * (drop - y))))
+				sprite.set_z_index(4)
 				lad.position = nav.map_to_world(Vector2(x, y + half))
 				collision.get_shape().set_extents(Vector2(32, 64 * half))
 				collision.position.x += 32
