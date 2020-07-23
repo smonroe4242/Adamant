@@ -13,6 +13,10 @@ var current := {}
 # actor_map = { Vector2: { int: { int, str } } }
 # actor_map[Vector2(0, 0)][12345] = {id: 12345, user: "Player1"}
 var actor_map := {}
+# Holds all monster coordinates
+# monster_map = { Vector2: { str: NodeReference } }
+# monster_map[Vector2(0, 0)] = { monster.name: monster }
+var monster_map := {}
 
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
@@ -30,36 +34,33 @@ func init_server():
 	print("READY")
 
 func _client_connect(id):
-	print("Server: Client ", str(id), " connected")
+	if current.size() == MAX_PLAYERS:
+		print("Too many players, can't fit ", id)
+#	print("Server: Client ", str(id), " connected")
 
 func _client_disconnect(id):
 	print("Server: Client ", str(id), " left")
-	if current.get(id) == null:
+	if not current.has(id):
 		print("Not a current player")
 		return
 	var c = current[id]
 	if not current.erase(id):
 		print("erase(id): not erased")
-	else:
-		print("erase(id) erased")
 	var deadClient = get_node("./World/" + str(id))
 	if deadClient == null:
 		print("Not a node in tree")
 		return
 	players[c.name].spawn = deadClient.position
 # warning-ignore:unsafe_method_access
-	get_node("./World").remove_dead_actor(deadClient.coords, id)
+	get_node("World").remove_dead_actor(id, deadClient.coords)
 	deadClient.queue_free()
-	for i in current:
-		rpc_id(i, "remove_player", id)
-	print("Server: removing player ", id)
 
 func validate_user(id, user, passwd):
-	if players.get(user) == null:
+	if not players.has(user):
 		print("Server: New Player: ", user, " as ", id)
-		players[user] = {'passwd': hash(passwd), 'spawn': Vector2(0, 0)}
+		players[user] = {'passwd': hash(passwd), 'spawn': Global.offsetv}
 	else:
-		if not current.get(user) == null:
+		if current.has(user):
 			print("Server: ", user, " is attempting to log in twice")
 			rpc_id(id, "client_login_failed", "You can't log in twice")
 			return false
@@ -67,16 +68,15 @@ func validate_user(id, user, passwd):
 			print("Server: Bad login")
 			rpc_id(id, "client_login_failed", "Invalid username or passrod")
 			return false
-	print("Server: Succesful Login for ", user)
 	return true
 
 remote func server_validate_login(id, user, passwd):
-	print("Server: Validating client ", str(id))
 	if validate_user(id, user, passwd):
-		load_player_server(id, user, players[user].spawn)
-		rpc_id(id, "load_world", players[user].spawn)
-		rpc_id(id, "load_player", id, user, players[user].spawn)
-		current[id] = {'id': id, 'name': user, 'spawn': players[user].spawn}
+		var spawn = players[user].spawn
+		load_player_server(id, user, spawn)
+		rpc_id(id, "load_world", spawn)
+		rpc_id(id, "load_player", id, user, spawn)
+		current[id] = {'id': id, 'name': user, 'spawn': spawn}
 
 func load_world_server():
 	print("Server: loading world")
@@ -85,11 +85,13 @@ func load_world_server():
 	get_node(".").add_child(world)
 
 func load_player_server(id, username, origin):
-	print("Server: loading player ", username)
+#	print("Server: loading player ", username)
 	var this_player = preload("res://server/ServerPlayer.tscn").instance()
 	this_player.set_name(str(id))
 	this_player.position = origin
 	this_player.set_network_master(id)
+	this_player.actor_map = actor_map
 	var world = get_node("./World")
 	world.actor_map = actor_map
+	world.monster_map = monster_map
 	world.call_deferred("add_child", this_player)

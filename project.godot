@@ -9,19 +9,43 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "KinematicBody2D",
+"class": "Actor",
+"language": "GDScript",
+"path": "res://game/Actor.gd"
+}, {
 "base": "Area2D",
 "class": "Ladder",
 "language": "GDScript",
 "path": "res://game/Ladder.gd"
 }, {
+"base": "Actor",
+"class": "Monster",
+"language": "GDScript",
+"path": "res://game/Monster.gd"
+}, {
 "base": "Node2D",
 "class": "NoiseLevel",
 "language": "GDScript",
 "path": "res://game/NoiseLevel.gd"
+}, {
+"base": "Actor",
+"class": "Player",
+"language": "GDScript",
+"path": "res://game/Player.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "ServerActor",
+"language": "GDScript",
+"path": "res://server/ServerActor.gd"
 } ]
 _global_script_class_icons={
+"Actor": "",
 "Ladder": "",
-"NoiseLevel": ""
+"Monster": "",
+"NoiseLevel": "",
+"Player": "",
+"ServerActor": ""
 }
 
 [application]
@@ -46,8 +70,33 @@ gdscript/warnings/unsafe_call_argument=true
 
 [display]
 
+window/size/width=512
+window/size/height=288
 window/stretch/mode="2d"
 window/stretch/aspect="keep"
+
+[importer_defaults]
+
+texture={
+"compress/bptc_ldr": 0,
+"compress/hdr_mode": 0,
+"compress/lossy_quality": 0.7,
+"compress/mode": 0,
+"compress/normal_map": 0,
+"detect_3d": false,
+"flags/anisotropic": false,
+"flags/filter": false,
+"flags/mipmaps": false,
+"flags/repeat": 0,
+"flags/srgb": 2,
+"process/HDR_as_SRGB": false,
+"process/fix_alpha_border": true,
+"process/invert_color": false,
+"process/premult_alpha": false,
+"size_limit": 0,
+"stream": false,
+"svg/scale": 1.0
+}
 
 [input]
 
@@ -95,9 +144,9 @@ block={
 [layer_names]
 
 2d_physics/layer_1="Environment"
-2d_physics/layer_2="Chunks"
-2d_physics/layer_3="Damage"
-2d_physics/layer_5="Player"
+2d_physics/layer_2="Monster"
+2d_physics/layer_3="Weapons"
+2d_physics/layer_4="Player"
 
 [network]
 

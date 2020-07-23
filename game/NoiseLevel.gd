@@ -4,34 +4,27 @@ class_name NoiseLevel
 var ladder = preload("res://game/Ladder.tscn")
 var grid = []
 enum biome {SKY, OVERWORLD, CAVE}
+const size = Global.chunk_size
 # Set by parent
 var coords
 var simplex
-var size
 var ref
 var type
 # Auto Tile Consts
-const EMPTY = 0
-const FILL = 1
-const R_SLOPE = 2
-const L_SLOPE = 3
-const ROCK = 4
-const L_BIG = 5
-const R_BIG = 6
+const EMPTY = -1
+const FILL = 0
 const LADDER = 7
-## TODO make tiles bitmaskable
-# autotile sets need to be adjusted for this, coop with nothawthorne
 onready var noise = $Noise
-onready var nav = $Nav
 
 # apply procgen layers to create traversable map
 func _ready():
-	if type == biome.CAVE:
-		gen_cave()
-	elif type == biome.OVERWORLD:
-		gen_overworld()
-	elif type == biome.SKY:
-		gen_skies()
+	match type:
+		biome.CAVE:
+			gen_cave()
+		biome.OVERWORLD:
+			gen_overworld()
+		biome.SKY:
+			gen_skies()
 
 ### Start Sky Gen
 func gen_skies():
@@ -39,30 +32,35 @@ func gen_skies():
 
 ### Start Overworld Gen
 func gen_overworld():
+	make_buildings()
 	make_bottom()
 	pass
 
+# Create buildings on the overworld
+func make_buildings():
+	pass
+
+# drop ladders to the underworld
 func make_bottom():
-	for y in size:
-		for x in size:
-			# add BG tiles of an overworld tileset
-			if y > size - 2:
-				# add grass and shit
-				pass
-			elif y > size / 3:
-				# add mid level scenery
-				pass
-			else:
-				# add sky
-				pass
+	var ground = []
+	ground.resize(size + 1)
+	for x in size + 1:
+		ground[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size)))
+	for x in size:
+		if ground[x] == EMPTY and ground[x + 1] == FILL:
+			make_ladder(x, size, size)
+			ground[x] = LADDER
+		elif ground[x] == FILL and ground[x + 1] == EMPTY:
+			make_ladder(x + 1, size, size)
+			ground[x + 1] = LADDER
 
 ### Level Generation
 func gen_cave():
 	make_grid()
-#	clear_paths() # leaving out until it works
+#	clear_paths()
 	drop_ladders()
-	smooth_noise()
 	place_tiles()
+
 # create binary from simplex noise floats
 func make_grid():
 	grid.resize(size)
@@ -70,7 +68,7 @@ func make_grid():
 		grid[x] = []
 		grid[x].resize(size)
 		for y in size:
-			grid[x][y] = EMPTY if simplex.get_noise_2dv(ref + Vector2(x, y)) < 0 else FILL
+			grid[x][y] = floor(simplex.get_noise_2dv(ref + Vector2(x, y)))
 
 # TODO see if there's an efficient way to use bsq to find thin walls
 func clear_paths():
@@ -88,7 +86,7 @@ func clear_paths():
 		bsq[0][y] = grid[0][y]
 	for x in range(1, size):
 		for y in range(1, size):
-			if grid[x][y] == 1:
+			if grid[x][y] == FILL:
 				bsq[x][y] = 1 + min(bsq[x][y - 1], min(bsq[x - 1][y], bsq[x - 1][y - 1]))
 			else:
 				bsq[x][y] = 0
@@ -96,73 +94,50 @@ func clear_paths():
 				maxsize = bsq[x][y]
 				mx = x
 				my = y
-	for x in maxsize:
-		for y in maxsize:
-			grid[mx - x][my - y] = R_SLOPE
-	var msz = 3
-	for x in range(1, size):
-		for y in range(1, size):
-			if bsq[x][x] == msz and bsq[x - 1][y] == msz - 1 and bsq[x][y - 1] == msz - 1 and bsq[x-1][y-1] == msz - 1:
-				for i in msz:
-					for j in msz:
-						grid[x - i][y - j] = L_SLOPE
+	var max_sz = 5
+	for x in range(1, size - 1):
+		for y in range(1, size - 1):
+			if bsq[x][y] < max_sz and bsq[x][y] > 0:
+				var msz = bsq[x][y]
+				if bsq[x][y] == msz and bsq[x+1][y+1] == 0 and bsq[x - msz][y - msz] == 0:
+					for i in msz:
+						for j in msz:
+							grid[x - i][y - j] = EMPTY
+
 # create Ladder objects at unjumpable overhangs
 func drop_ladders():
 	for x in range(1, size - 1):
 		for y in range(1, size - 3):
-			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and grid[x][y + 2] == EMPTY and (((grid[x - 1][y] != LADDER and grid[x - 1][y] != EMPTY) and grid[x - 1][y - 1] == EMPTY) or ((grid[x + 1][y] != LADDER and grid[x + 1][y] != EMPTY) and grid[x + 1][y - 1] == EMPTY)):
+			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and grid[x][y + 2] == EMPTY and ( ( grid[x - 1][y] != EMPTY and grid[x - 1][y - 1] == EMPTY) or (grid[x + 1][y] != EMPTY and grid[x + 1][y - 1] == EMPTY)):
 				var drop = y
 				while drop < size and grid[x][drop] == EMPTY:
-#					grid[x][drop] = LADDER
 					drop += 1
-				if drop == size and grid[x][size - 1] == EMPTY:
-					while simplex.get_noise_2dv(ref + Vector2(x, drop)) < 0:
-						drop += 1
-#				drop -= 1
-				var lad = ladder.instance()
-				var collision = CollisionShape2D.new()
-				collision.set_shape(RectangleShape2D.new())
-				lad.add_child(collision)
-				var half = (drop - y) / 2
-				var sprite = lad.get_node("Sprite")
-				sprite.set_region(true)
-				sprite.set_region_rect(Rect2(Vector2(0, 0), Vector2(64, 64 * (drop - y))))
-				sprite.set_z_index(4)
-				lad.position = nav.map_to_world(Vector2(x, y + half))
-				collision.get_shape().set_extents(Vector2(32, 64 * half))
-				collision.position.x += 32
-				call_deferred("add_child", lad)
+				make_ladder(x, y, drop)
 
-# add slop blocks on one block high steps
-func smooth_noise():
-	for x in range(0, size - 1):
-		for y in range(0, size - 1):
-			if grid[x][y] == FILL and grid[x + 1][y] == EMPTY and grid[x+1][y + 1] == FILL:
-				grid[x + 1][y] = R_SLOPE
-			elif grid[x][y] == EMPTY and grid[x + 1][y] == FILL and grid[x][y + 1] == FILL:
-				grid[x][y] = L_SLOPE
+func make_ladder(x, y, drop):
+	while floor(simplex.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
+		drop += 1
+	if drop <= y:
+		return
+	var lad = ladder.instance()
+	var collision = CollisionShape2D.new()
+	collision.set_shape(RectangleShape2D.new())
+	lad.add_child(collision)
+	var half = (drop - y) / 2
+	var sprite = lad.get_node("Sprite")
+	sprite.set_region(true)
+	sprite.set_region_rect(Rect2(Vector2(0, 0), Vector2(16, 16 * (drop - y))))
+	sprite.set_z_index(0)
+	lad.position = noise.map_to_world(Vector2(x, y + half))
+	collision.get_shape().set_extents(Vector2(8, 16 * half))
+	collision.position += Vector2(8, 16)
+	call_deferred("add_child", lad)
 
 # transform from integer grid to tilemap
 func place_tiles():
 	for x in size:
 		for y in size:
-			var cell = grid[x][y]
-			if cell == FILL: #colliding block
-#				if x > 0 and grid[x-1][y] == FILL and randi() & 3 == 1:
-#					noise.set_cell(x-1, y, L_BIG)
-#					noise.set_cell(x, y, R_BIG)
-#				else:
-				noise.set_cell(x, y, ROCK)
-			elif cell == L_SLOPE or cell == R_SLOPE:
-				noise.set_cell(x, y, cell)
-			else:
-				noise.set_cell(x, y, (randi() & 7) + 10)
-#			if cell == LADDER:
-#				nav.set_cell(x, y, 0)
-
-### End Level Genreation
-
-signal player_entered
-func _on_Area2D_area_entered(area):
-	if not area.get_parent().get('onLadder') == null and area.is_network_master():
-		emit_signal("player_entered", coords)
+			if grid[x][y] == FILL: #colliding block
+				noise.set_cell(x, y, 1)
+	noise.update_bitmask_region()
+### End Level Generation

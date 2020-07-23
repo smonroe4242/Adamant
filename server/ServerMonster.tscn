@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://server/ServerPlayer.gd" type="Script" id=1]
+[ext_resource path="res://server/ServerMonster.gd" type="Script" id=1]
 [ext_resource path="res://server/ServerActor.tscn" type="PackedScene" id=2]
 
 [node name="KinematicBody2D" instance=ExtResource( 2 )]

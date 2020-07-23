@@ -10,12 +10,15 @@ func _ready():
 	user.text = Global.username
 	passwd.text = ""
 	error.text = Global.error
+	if user.text == "":
+		user.grab_focus()
+	elif passwd.text == "":
+		passwd.grab_focus()
 
 func _on_Button_pressed():
 	var ip = IP.resolve_hostname(server.text, 1)
-	print("Login: resolve_hostname(): ", ip)
 	Global.server_ip = ip
-	print(server.text, ":", Global.server_ip)
+	print("Login: resolve_hostname(): ", server.text, ":", Global.server_ip)
 	Global.username = user.text
 	Global.password = passwd.text
 	if get_tree().change_scene("res://client/Client.tscn"):

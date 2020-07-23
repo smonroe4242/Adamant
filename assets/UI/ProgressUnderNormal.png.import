@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/s4m_ur4i-2D-gothic-soulslike_tileset.png-c9e252ce48340581a3abaaa3664dc480.stex"
+path="res://.import/ProgressUnderNormal.png-8ecca7ffeeed7f9b1a55ab2c9bb39882.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/s4m_ur4i-2D-gothic-soulslike_tileset.png"
-dest_files=[ "res://.import/s4m_ur4i-2D-gothic-soulslike_tileset.png-c9e252ce48340581a3abaaa3664dc480.stex" ]
+source_file="res://assets/UI/ProgressUnderNormal.png"
+dest_files=[ "res://.import/ProgressUnderNormal.png-8ecca7ffeeed7f9b1a55ab2c9bb39882.stex" ]
 
 [params]
 

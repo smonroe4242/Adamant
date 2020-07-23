@@ -11,7 +11,7 @@ __meta__ = {
 }
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( 32, 32 )
+position = Vector2( 7, 8 )
 texture = ExtResource( 2 )
 region_enabled = true
 [connection signal="body_entered" from="." to="." method="_on_Ladder_body_entered"]

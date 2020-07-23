@@ -88,6 +88,8 @@ margin_bottom = 177.0
 hint_tooltip = "password"
 custom_fonts/font = SubResource( 3 )
 secret = true
+shortcut_keys_enabled = false
+selecting_enabled = false
 placeholder_text = "password"
 __meta__ = {
 "_edit_use_anchors_": false
