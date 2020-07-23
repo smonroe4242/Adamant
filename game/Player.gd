@@ -73,7 +73,7 @@ func _physics_process(_delta):
 					velocity.y += GRAV
 	#				print(velocity)
 			else:
-				snap = Vector2(0, 0)
+				snap = Vector2(0, 0) if on_floor else Vector2(0, 16)
 				animation = "idle"
 				sprite.play("idle")
 				velocity.y = 0
