@@ -3,8 +3,10 @@ class_name NoiseLevel
 
 var ladder = preload("res://game/Ladder.tscn")
 var grid = []
-enum biome {SKY, OVERWORLD, CAVE}
-const size = Global.chunk_size
+enum biome {Underworld, Ground, Overworld}
+const size = Global.chunk_size + 2
+const pix = Global.tile_size
+const hpix = Global.tile_size >> 1
 # Set by parent
 var coords
 var simplex
@@ -19,19 +21,19 @@ onready var noise = $Noise
 # apply procgen layers to create traversable map
 func _ready():
 	match type:
-		biome.CAVE:
-			gen_cave()
-		biome.OVERWORLD:
+		biome.Underworld:
+			gen_underworld()
+		biome.Ground:
+			gen_groundlevel()
+		biome.Overworld:
 			gen_overworld()
-		biome.SKY:
-			gen_skies()
 
 ### Start Sky Gen
-func gen_skies():
+func gen_overworld():
 	pass
 
 ### Start Overworld Gen
-func gen_overworld():
+func gen_groundlevel():
 	make_buildings()
 	make_bottom()
 	pass
@@ -43,30 +45,42 @@ func make_buildings():
 # drop ladders to the underworld
 func make_bottom():
 	var ground = []
+	var overlap = []
 	ground.resize(size + 1)
+	overlap.resize(size + 1)
 	for x in size + 1:
-		ground[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size)))
+		ground[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size - 2)))
+		overlap[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size - 1)))
 	for x in size:
 		if ground[x] == EMPTY and ground[x + 1] == FILL:
-			make_ladder(x, size, size)
+			make_ladder(x, size - 2, size - 2)
 			ground[x] = LADDER
 		elif ground[x] == FILL and ground[x + 1] == EMPTY:
-			make_ladder(x + 1, size, size)
+			make_ladder(x + 1, size - 2, size - 2)
 			ground[x + 1] = LADDER
+		if ground[x] == FILL:
+			noise.set_cell(x, size - 2, 1)
+		if overlap[x] == FILL:
+			noise.set_cell(x, size - 1, 1)
+	noise.update_bitmask_region()
+	for x in size:
+		noise.set_cell(x, size - 1, -1)
+	noise.set_cell(size - 1, size - 2, -1)
+	noise.set_cell(0, size - 2, -1)
 
 ### Level Generation
-func gen_cave():
-	make_grid()
+func gen_underworld():
+	make_grid(size)
 #	clear_paths()
-	drop_ladders()
-	place_tiles()
+	drop_ladders(size)
+	place_tiles(size)
 
-# create binary from simplex noise floats
-func make_grid():
+# create binary matrix from simplex noise floats
+func make_grid(height):
 	grid.resize(size)
 	for x in size:
 		grid[x] = []
-		grid[x].resize(size)
+		grid[x].resize(height)
 		for y in size:
 			grid[x][y] = floor(simplex.get_noise_2dv(ref + Vector2(x, y)))
 
@@ -105,9 +119,9 @@ func clear_paths():
 							grid[x - i][y - j] = EMPTY
 
 # create Ladder objects at unjumpable overhangs
-func drop_ladders():
+func drop_ladders(height):
 	for x in range(1, size - 1):
-		for y in range(1, size - 3):
+		for y in range(1, height - 3):
 			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and grid[x][y + 2] == EMPTY and ( ( grid[x - 1][y] != EMPTY and grid[x - 1][y - 1] == EMPTY) or (grid[x + 1][y] != EMPTY and grid[x + 1][y - 1] == EMPTY)):
 				var drop = y
 				while drop < size and grid[x][drop] == EMPTY:
@@ -117,27 +131,36 @@ func drop_ladders():
 func make_ladder(x, y, drop):
 	while floor(simplex.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
 		drop += 1
-	if drop <= y:
+	var height = drop - y
+	if height < 2:
 		return
+	var fix = Vector2(0, 0 if height & 1 == 1 else -pix / 2)
 	var lad = ladder.instance()
 	var collision = CollisionShape2D.new()
-	collision.set_shape(RectangleShape2D.new())
-	lad.add_child(collision)
-	var half = (drop - y) / 2
 	var sprite = lad.get_node("Sprite")
+	lad.add_child(collision)
+	lad.position = noise.map_to_world(Vector2(x, y + (height / 2))) + fix
 	sprite.set_region(true)
-	sprite.set_region_rect(Rect2(Vector2(0, 0), Vector2(16, 16 * (drop - y))))
+	sprite.set_region_rect(Rect2(Vector2(0, 0), Vector2(pix, pix * height)))
 	sprite.set_z_index(0)
-	lad.position = noise.map_to_world(Vector2(x, y + half))
-	collision.get_shape().set_extents(Vector2(8, 16 * half))
-	collision.position += Vector2(8, 16)
+	collision.set_shape(RectangleShape2D.new())
+	collision.get_shape().set_extents(Vector2(hpix, hpix * height))
+	collision.position += Vector2(hpix, hpix)
 	call_deferred("add_child", lad)
 
 # transform from integer grid to tilemap
-func place_tiles():
+func place_tiles(height):
+	# Set tiles
 	for x in size:
-		for y in size:
+		for y in height:
 			if grid[x][y] == FILL: #colliding block
 				noise.set_cell(x, y, 1)
+	# Run autotiler
 	noise.update_bitmask_region()
+	# Erase overlapped borders
+	for x in size:
+		noise.set_cell(0,    x, -1)
+		noise.set_cell(size - 1, x, -1)
+		noise.set_cell(x,    0, -1)
+		noise.set_cell(x, size - 1, -1)
 ### End Level Generation

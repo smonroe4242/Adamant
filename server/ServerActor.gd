@@ -26,14 +26,13 @@ func _ready():
 	puppet_hp = hp
 	puppet_coords = coords
 ### TODO master and pupper
-remote func set_vars(p, v, a, l, m, h, c):
+remote func set_vars(p, v, a, l, m, h):
 	position = p
 	velocity = v
 	animation = a
 	left_flip = l
 	max_hp = m
 	hp = h
-	coords = c
 
 remote func request_damage(target):
 	var parent = get_parent()

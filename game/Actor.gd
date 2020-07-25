@@ -7,9 +7,10 @@ master var animation := "idle"
 master var left_flip := false
 master var hp := 100
 master var max_hp = 100
+master var blocking = false
 var level := 0
 var coords = null
-var respawn := Vector2(10, 10)
+var respawn := Global.origin
 var displayName := "New Actor"
 puppet var puppet_position := Vector2()
 puppet var puppet_velocity := Vector2()
@@ -49,23 +50,21 @@ func _ready():
 	add_child(attack_timer)
 	overhead.update_display(hp, max_hp)
 
-remote func set_vars(p, v, a, l, m, h, c):
+remote func set_vars(p, v, a, l, m, h):
 	position = p
 	velocity = v
 	animation = a
 	left_flip = l
 	max_hp = m
 	hp = h
-	coords = c
 
-remote func set_puppet_vars(p, v, a, l, m, h, c):
+remote func set_puppet_vars(p, v, a, l, m, h):
 	puppet_position = p
 	puppet_velocity = v
 	puppet_animation = a
 	puppet_left_flip = l
 	puppet_max_hp = m
 	puppet_hp = h
-	puppet_coords = c
 
 func _attack_finish():
 	animation = "idle"
@@ -85,6 +84,19 @@ remote func _attack():
 	sprite.play(animation)
 	attack_timer.start()
 
+func _block(on_floor):
+	animation = "block"
+	sprite.play("block")
+	blocking = true
+	if on_floor:
+		velocity.x = 0
+		velocity.y = 0
+
+func _block_finish():
+	blocking = false
+	animation = "idle"
+	sprite.play("idle")
+
 func set_display_name(user):
 	displayName = user
 
@@ -96,8 +108,9 @@ func update_coords():
 
 remote func damage(amt):
 #	print(name, " damaged (", str(hp - amt), ")", str(get_tree().get_network_unique_id()))
-	hp -= amt
-	overhead.update_display(hp, max_hp)
+	if not blocking:
+		hp -= amt
+		overhead.update_display(hp, max_hp)
 
 remote func die():
 	print("DEATH")

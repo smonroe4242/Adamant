@@ -163,6 +163,8 @@ func unload_players(actor_id, chunk):
 		rpc_id(player, "unload_actor", actor_id)
 	rpc_id(actor_id, "unload_actors", actor_map[chunk].keys())
 func spawn_monsters(chunk):
+	# for 0.1.0, no monsters
+	return
 #	print("spawn_monsters(", chunk, ")")
 # Given a chunk
 #   Create a monster on the server
@@ -185,6 +187,8 @@ func spawn_monsters(chunk):
 		monster_map[chunk] = {}
 	monster_map[chunk][mob.name] = mob
 func send_monsters(actor_id, chunk):
+	# for 0.1.0, no monsters
+	return
 #	print("send_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
 # Given a user and a chunk
 #   Tell the user about every monster in the chunk
@@ -194,6 +198,8 @@ func send_monsters(actor_id, chunk):
 		print("Server: send_monsters(): ", chunk, " not found in monster_map")
 		print("Server: MonsterMap: ", monster_map)
 func unload_monsters(actor_id, chunk):
+	# for 0.1.0, no monsters
+	return
 #	print("unload_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
 # Given a user and a chunk
 #   Tell the user to unload every monster in the chunk
@@ -204,6 +210,8 @@ func unload_monsters(actor_id, chunk):
 		print("Server: MonsterMap: ", monster_map)
 
 func despawn_monsters(chunk):
+	# for 0.1.0, no monsters
+	return
 #	print("despawn_monsters(", chunk, "): ", monster_map[chunk])
 # Given a chunk
 #   Remove every monster in the chunk from the server

@@ -1,10 +1,11 @@
 extends Node2D
 
-const server_port := 8910
-const chunk_size := 32 # tiles per chunk
-const tile_size := 16 # pixels per tile
-const chunk_offset := chunk_size * tile_size
-const offsetv := Vector2(chunk_offset, chunk_offset)
+const server_port := 8910 # Port that game traffic goes through
+const tile_size := 16 # Pixel width of a tile
+const chunk_size := 64 # Tile wdith of a chunk
+const chunk_offset := chunk_size * tile_size # Pixel width of a chunk
+const offsetv := Vector2(chunk_offset, chunk_offset) # Pixel offset of a chunk
+const origin = offsetv + Vector2(64, -64) # Pixel coords of a new player's login spawn
 # warning-ignore:unused_class_variable
 var server_ip := ""
 # warning-ignore:unused_class_variable

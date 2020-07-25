@@ -58,7 +58,7 @@ func _client_disconnect(id):
 func validate_user(id, user, passwd):
 	if not players.has(user):
 		print("Server: New Player: ", user, " as ", id)
-		players[user] = {'passwd': hash(passwd), 'spawn': Global.offsetv}
+		players[user] = {'passwd': hash(passwd), 'spawn': Global.origin}
 	else:
 		if current.has(user):
 			print("Server: ", user, " is attempting to log in twice")
@@ -84,11 +84,11 @@ func load_world_server():
 	world.name = "World"
 	get_node(".").add_child(world)
 
-func load_player_server(id, username, origin):
+func load_player_server(id, username, spawn):
 #	print("Server: loading player ", username)
 	var this_player = preload("res://server/ServerPlayer.tscn").instance()
 	this_player.set_name(str(id))
-	this_player.position = origin
+	this_player.position = spawn
 	this_player.set_network_master(id)
 	this_player.actor_map = actor_map
 	var world = get_node("./World")

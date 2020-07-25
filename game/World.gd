@@ -5,7 +5,7 @@ const size = Global.chunk_size
 var simplex = OpenSimplexNoise.new()
 var chunks = {}
 var origin = Vector2(0, 0)
-enum biome {SKY, OVERWORLD, CAVE}
+enum biome {Underworld, Ground, Overworld}
 
 func _ready():
 	make_noise()
@@ -26,8 +26,8 @@ func gen_chunk(v):
 	if v in chunks.keys():
 		return
 	var lvl = level.instance()
-	lvl.type = biome.OVERWORLD if v.y == 0 else biome.CAVE if v.y > 0 else biome.SKY
-	lvl.position = v * offset
+	lvl.type = biome.Underworld if v.y > 0 else biome.Ground if v.y == 0 else biome.Overworld
+	lvl.position = (v * offset) - Vector2(Global.tile_size, Global.tile_size)
 	lvl.coords = v
 	lvl.ref = v * Vector2(size, size)
 	lvl.simplex = simplex
