@@ -1,9 +1,6 @@
 extends Actor
 class_name Player
-var STEP = 150
-var snap := Vector2(0, 16)
-var onLadder := int(0)
-var jumping = false
+var climbing := int(0)
 ### DEV ONLY
 #var flying = false
 ### END DEV ONLY
@@ -40,6 +37,7 @@ func _physics_process(_delta):
 #			update_coords()
 #			velocity = Vector2(0, 0)
 #			return
+#		el
 		### END DEV ONLY
 		if hp > 0:
 			# client og code
@@ -47,81 +45,61 @@ func _physics_process(_delta):
 				_block(on_floor)
 			elif Input.is_action_just_released('block'):
 				_block_finish()
-			elif Input.is_action_pressed('attack'):
-				attacking = true
-			elif Input.is_action_pressed('ui_right') and !attacking:
-				velocity.x = STEP
-				if on_floor:
-					animation = "run"
-					sprite.play("run")
-				if left_flip == true:
-					weapon.position.x = -weapon.position.x
-				left_flip = false
-			elif Input.is_action_pressed('ui_left') and !attacking:
-				velocity.x = -STEP
-				if on_floor:
-					animation = "run"
-					sprite.play("run")
-				if left_flip == false:
-					weapon.position.x = -weapon.position.x
-				left_flip = true
-			else:
-				velocity.x = 0
-				if on_floor and attack_phase == 0:
-					animation = "idle"
-					sprite.play("idle")
-
-			if attacking == true and attack_phase == 0:
+			elif Input.is_action_pressed('attack') and not attacking:
 				_attack()
-			if (attacking == true or attack_phase > 0) and on_floor:
+			elif Input.is_action_pressed('ui_right') and not attacking:
+				_walk_right(on_floor)
+			elif Input.is_action_pressed('ui_left') and not attacking:
+				_walk_left(on_floor)
+			else:
+				_hold_still(on_floor)
+
+			if attacking and on_floor:
 				velocity.x = 0
 
-			if onLadder == 0:
+			if not climbing:
 				if on_floor:
 					if Input.is_action_pressed('ui_up'):
-						velocity.y = -STEP
-						animation = "jump_start"
-						sprite.play("jump_start")
-						jumping = true
-						snap = Vector2(0, 0)
+						_jump()
 					elif jumping == true:
-						sprite.play()
-						animation = "jump_end"
-						jumping = false
-						snap = Vector2(0, 16)
+						_land()
 				else:
-					if abs(velocity.y) < GRAV:
-						animation = "jump_end"
-						sprite.play("jump_end")
-						sprite.stop()
-
+					if velocity.y > 0:
+						_fall()
 					velocity.y += GRAV
-	#				print(velocity)
 			else:
 				snap = Vector2(0, 0) if on_floor else Vector2(0, 16)
 				animation = "idle"
-				sprite.play("idle")
 				velocity.y = 0
 				if Input.is_action_pressed('ui_up'):
 					velocity.y = -STEP
 				elif Input.is_action_pressed('ui_down'):
 					velocity.y = STEP
-		rpc_unreliable_id(1, "set_vars", position, velocity, animation, left_flip, max_hp, hp)
-	else:
-		#client replica code
-		set_vars(
-			puppet_position,
-			puppet_velocity,
-			puppet_animation,
-			puppet_left_flip,
-			puppet_max_hp,
-			puppet_hp)
-		sprite.play(animation)
 
-# warning-ignore:unsafe_method_access
+		if sprite.animation != animation:
+			sprite.play(animation)
+		set_vars(position, animation, left_flip, max_hp, hp, blocking)
+	else:
+		position = puppet_position
+		left_flip = puppet_left_flip
+		if sprite.animation != puppet_animation:
+#			print("Client: ", name, ": animation different: ", animation, " to ", puppet_animation)
+			animation = puppet_animation
+			sprite.animation = animation
+			sprite.play()
+		if max_hp != puppet_max_hp or hp != puppet_hp:
+			max_hp = puppet_max_hp
+			hp = puppet_hp
+			overhead.update_display(max_hp, hp)
+		if puppet_blocking != blocking:
+			if puppet_blocking:
+				_block(on_floor)
+			else:
+				_block_finish()
+
 	sprite.set_flip_h(left_flip)
 
-	if on_floor and not onLadder and not jumping:
+	if on_floor and not climbing and not jumping:
 		velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 1, rad2deg(50))
 	else:
 		velocity = move_and_slide(velocity, Vector2.UP)

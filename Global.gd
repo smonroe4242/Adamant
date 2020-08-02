@@ -1,20 +1,15 @@
 extends Node2D
-
-const server_port := 8910 # Port that game traffic goes through
+# warning-ignore-all:unused_class_variable
+const server_port := 49152 # Port that game traffic goes through
 const tile_size := 16 # Pixel width of a tile
 const chunk_size := 64 # Tile wdith of a chunk
 const chunk_offset := chunk_size * tile_size # Pixel width of a chunk
 const offsetv := Vector2(chunk_offset, chunk_offset) # Pixel offset of a chunk
 const origin = offsetv + Vector2(64, -64) # Pixel coords of a new player's login spawn
-# warning-ignore:unused_class_variable
 var server_ip := ""
-# warning-ignore:unused_class_variable
 var username := ""
-# warning-ignore:unused_class_variable
 var password := ""
-# warning-ignore:unused_class_variable
 var error := ""
-# warning-ignore:unused_class_variable
 var player_node = null
 
 func get_area(v):
@@ -173,10 +168,10 @@ func set_err_msg(err, to_print = true):
 	'ERR_BUG',
 	'ERR_PRINTER_ON_FIRE'
 	]
+	var header = "Server: " if get_tree().is_network_server() else "Client: "
 	if err > -1 and err < code.size():
 		error = code[err] + ": " + msg[err]
 	else:
 		error = 'UNKNOWN ENGINE ERROR: This is not a known error code, please contact a developer.'
 	if to_print:
-		print(error)
-	return error
+		print(header + error)

@@ -19,7 +19,7 @@ light_mask = -2147483647
 position = Vector2( 0, 3 )
 frames = ExtResource( 1 )
 animation = "idle"
-frame = 5
+frame = 11
 playing = true
 
 [node name="CollisionShape2D" parent="." index="1"]

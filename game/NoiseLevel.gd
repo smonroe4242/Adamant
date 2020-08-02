@@ -121,8 +121,8 @@ func clear_paths():
 # create Ladder objects at unjumpable overhangs
 func drop_ladders(height):
 	for x in range(1, size - 1):
-		for y in range(1, height - 3):
-			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and grid[x][y + 2] == EMPTY and ( ( grid[x - 1][y] != EMPTY and grid[x - 1][y - 1] == EMPTY) or (grid[x + 1][y] != EMPTY and grid[x + 1][y - 1] == EMPTY)):
+		for y in range(1, height - 1):
+			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and ( ( grid[x - 1][y] != EMPTY and grid[x - 1][y - 1] == EMPTY) or (grid[x + 1][y] != EMPTY and grid[x + 1][y - 1] == EMPTY)):
 				var drop = y
 				while drop < size and grid[x][drop] == EMPTY:
 					drop += 1
@@ -132,7 +132,7 @@ func make_ladder(x, y, drop):
 	while floor(simplex.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
 		drop += 1
 	var height = drop - y
-	if height < 2:
+	if height < 3:
 		return
 	var fix = Vector2(0, 0 if height & 1 == 1 else -pix / 2)
 	var lad = ladder.instance()

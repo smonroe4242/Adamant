@@ -4,9 +4,7 @@ func _enter_tree():
 	init_client()
 
 func init_client():
-	print("CLIENT")
 	var tree = get_tree()
-#	tree.set_debug_collisions_hint(true)
 	var peer = NetworkedMultiplayerENet.new()
 	tree.connect("connected_to_server", self, "_server_connect")
 	tree.connect("connection_failed", self, "_server_connect_fail")
@@ -15,7 +13,7 @@ func init_client():
 	if err:
 		client_login_failed(err)
 	tree.network_peer = peer
-	print("READY")
+	print("Client: READY")
 
 func _server_connect():
 	print("Client: server connected")
@@ -36,23 +34,26 @@ remote func client_login_failed(err):
 	else:
 		Global.error = err
 	if get_tree().change_scene("res://client/Login.tscn"):
-		print("Error changing scene to Login")
+		print("Client: Error changing scene to Login")
 	else:
-		print("Success changing to Login")
+		print("Client: Success changing to Login")
 
 remote func load_world(origin):
 	var world = preload("res://game/World.tscn").instance()
 	world.origin = origin
 	get_node(".").add_child(world)
 
-remote func load_player(id, username, origin):
-	print("loading player ", username)
+remote func load_player(id, username, origin, max_hp, hp):
+	print("Client: loading player ", username)
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
 	this_player.set_display_name(username)
 	this_player.position = origin
+	this_player.max_hp = max_hp
+	this_player.hp = hp
 	this_player.set_network_master(id)
 	this_player.get_node("Camera2D").current = true
 	this_player.connect("player_entered", get_node("./World"), "player_entered")
 	Global.player_node = this_player
+	print("Client: LOAD_PLAYER: hp: ", this_player.hp, ", max_hp: ", this_player.max_hp)
 	get_node("./World").call_deferred("add_child", this_player)

@@ -19,7 +19,7 @@ func make_noise():
 	simplex.set_seed(13)
 	simplex.set_lacunarity(2.0)
 	simplex.set_octaves(1)
-	simplex.set_period(10.0)
+	simplex.set_period(7.0)
 	simplex.set_persistence(1)
 
 func gen_chunk(v):
@@ -37,18 +37,28 @@ func gen_chunk(v):
 remote func load_actors(actors):
 	if not actors == null:
 		for actor in actors:
-			load_actor(actor.id, actor.user)
+			load_actor(actor)
 
-remote func load_actor(id, username):
-	if not get_node(str(id)) == null:
-		print("Client: load_actor(): player ", id, " already in tree")
-	print("Loading ", username)
+remote func load_actor(stats):#id, username, pos, mhp, hp):
+	print("Client: load_actor: ", stats)
+	if not get_node(str(stats.id)) == null:
+		print("Client: load_actor(): player ", stats.id, " already in tree")
+		return
+	print("Client: Loading ", stats.user)
 	var this_player = preload("res://game/Player.tscn").instance()
-	this_player.set_name(str(id))
-	this_player.set_display_name(username)
-	this_player.set_network_master(1)
-	this_player.get_node("Camera2D").current = false
-	call_deferred("add_child", this_player)
+	set_stats_obj(this_player, stats)
+	add_child(this_player)
+
+func set_stats_obj(node, stats):
+	node.set_name(str(stats.id))
+	node.set_display_name(stats.user)
+	node.position = stats.position
+	node.animation = stats.animation
+	node.max_hp = stats.max_hp
+	node.hp = stats.hp
+	node.blocking = stats.blocking
+	node.get_node("Camera2D").current = false
+	node.set_network_master(1)
 
 func kill_chunk(v):
 	if not chunks.has(v):
@@ -83,7 +93,7 @@ remote func load_monsters(names, chunk):
 
 remote func load_monster(node_name, level):
 	var mob = preload("res://game/Monster.tscn").instance()
-	mob.displayName = "Big Dark Boi LVL" + str(level)
+	mob.displayName = "BigBoi LVL" + str(level)
 	mob.level = level
 	mob.name = node_name
 	mob.set_network_master(1)

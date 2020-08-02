@@ -30,9 +30,9 @@ func remove_dead_actor(actor_id, coords): # Can this be used for both disconnect
 					break
 		if  real_coords == null:
 			print("Server: remove_dead_actor(): actor could not be found, exiting early.")
-			print("ActorMap: ", actor_map)
+			print("Server: ActorMap: ", actor_map)
 			return
-		print("ActorMap: ", actor_map)
+		print("Server: ActorMap: ", actor_map)
 		coords = real_coords
 	if not actor_map[coords].erase(actor_id):
 		print("Server: remove_dead_actor(): failed actor_map[", coords, "].erase(", actor_id, ")")
@@ -43,7 +43,7 @@ func remove_dead_actor(actor_id, coords): # Can this be used for both disconnect
 	for chunk in Global.get_area(coords):
 		if actor_map.has(chunk):
 			# This chunk has other players, so we tell them somebody left
-			print("SERVER: unloading actor ", actor_id, " from ", actor_map[chunk].keys())
+			print("Server: unloading actor ", actor_id, " from ", actor_map[chunk].keys())
 			for player in actor_map[chunk].keys():
 				rpc_id(player, "unload_actor", actor_id)
 		elif monster_map.has(chunk):
@@ -78,7 +78,19 @@ remote func get_local_actors(coords, username):
 			send_monsters(actor_id, chunk)
 	if not actor_map.has(coords):
 		actor_map[coords] = {}
-	actor_map[coords][actor_id] = {'id': actor_id, 'user': username}
+	var node = get_node(str(actor_id))
+	actor_map[coords][actor_id] = node
+
+func get_stats_obj(node):
+	return {
+		'id': node.name,
+		'user': node.username,
+		'position': node.position,
+		'animation': node.animation,
+		'max_hp': node.max_hp,
+		'hp': node.hp,
+		'blocking': node.blocking
+	}
 
 remote func update_player_coords(old_coords, new_coords, username):
 #	print("UpdatePlayerCoords Entry Params: old_coords: ", old_coords, ", new_coords: ", new_coords, ", username: ", username)
@@ -151,9 +163,10 @@ func send_players(actor_id, username, chunk):
 # Given a user and a chunk:
 #   Tell the user about every player in the chunk
 #   Tell every player in the chunk about the user
-	for player in actor_map[chunk].keys():
-		rpc_id(player, "load_actor", actor_id, username)
-	rpc_id(actor_id, "load_actors", actor_map[chunk].values())
+	var user = get_stats_obj(get_node(str(actor_id)))
+	for id in actor_map[chunk].keys():
+		rpc_id(id, "load_actor", user)
+		rpc_id(actor_id, "load_actor", get_stats_obj(actor_map[chunk][id]))
 func unload_players(actor_id, chunk):
 #	print("unload_players(", actor_id, ", ", chunk, "): ", actor_map[chunk].keys())
 # Given a user and a chunk
@@ -180,8 +193,6 @@ func spawn_monsters(chunk):
 	mob.level = chunk.y
 	mob.max_hp = chunk.y * 100
 	mob.hp = mob.max_hp
-	if not chunk in monster_map:
-		monster_map[chunk] = {}
 	call_deferred("add_child", mob)
 	if not monster_map.has(chunk):
 		monster_map[chunk] = {}
@@ -218,7 +229,7 @@ func despawn_monsters(chunk):
 #   But only if nobody can see it
 	if not monster_map.has(chunk):
 		print("Server: unload_monsters(): ", chunk, " not found in monster_map")
-		print("MonsterMap: ", monster_map)
+		print("Server: MonsterMap: ", monster_map)
 #	print("Server: despawn_monsters(): monster_map[chunk]: ", monster_map[chunk])
 	var observed = false
 	for area in Global.get_area(chunk):
