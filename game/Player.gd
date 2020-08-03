@@ -2,44 +2,44 @@ extends Actor
 class_name Player
 var climbing := int(0)
 ### DEV ONLY
-#var flying = false
+var flying = false
 ### END DEV ONLY
 func _physics_process(_delta):
 	var on_floor = is_on_floor()
 	if is_network_master():
 		### DEV ONLY
-#		if Input.is_action_pressed('fly') and not flying:
-#			flying = true
-#			hitbox.disabled = true
-#			hide()
-#		elif Input.is_action_pressed('fly') and flying:
-#			flying = false
-#			hitbox.disabled = false
-#			$Camera2D.zoom = Vector2(1, 1)
-#			STEP = 150
-#			show()
-#		if flying:
-#			if Input.is_action_pressed('ui_right'):
-#				velocity.x = STEP
-#			if Input.is_action_pressed('ui_left'):
-#				velocity.x = -STEP
-#			if Input.is_action_pressed('ui_up'):
-#				velocity.y = -STEP
-#			if Input.is_action_pressed('ui_down'):
-#				velocity.y = STEP
-#			if Input.is_action_pressed('attack'):
-#				$Camera2D.zoom += Vector2(1, 1)
-#				STEP += 100
-#			if Input.is_action_pressed('block'):
-#				$Camera2D.zoom -= Vector2(1, 1)
-#				STEP -= 100
-#			velocity = move_and_slide(velocity, Vector2.UP)
-#			update_coords()
-#			velocity = Vector2(0, 0)
-#			return
-#		el
+		if Input.is_action_pressed('fly') and not flying:
+			flying = true
+			hitbox.disabled = true
+			hide()
+		elif Input.is_action_pressed('fly') and flying:
+			flying = false
+			hitbox.disabled = false
+			$Camera2D.zoom = Vector2(1, 1)
+			STEP = 150
+			show()
+		if flying:
+			if Input.is_action_pressed('ui_right'):
+				velocity.x = STEP
+			if Input.is_action_pressed('ui_left'):
+				velocity.x = -STEP
+			if Input.is_action_pressed('ui_up'):
+				velocity.y = -STEP
+			if Input.is_action_pressed('ui_down'):
+				velocity.y = STEP
+			if Input.is_action_pressed('attack'):
+				$Camera2D.zoom += Vector2(1, 1)
+				STEP += 100
+			if Input.is_action_pressed('block'):
+				$Camera2D.zoom -= Vector2(1, 1)
+				STEP -= 100
+			velocity = move_and_slide(velocity, Vector2.UP)
+			update_coords()
+			velocity = Vector2(0, 0)
+			return
+
 		### END DEV ONLY
-		if hp > 0:
+		elif hp > 0:
 			# client og code
 			if Input.is_action_pressed('block') and attacking != true:
 				_block(on_floor)

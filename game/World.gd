@@ -2,7 +2,8 @@ extends Node2D
 const level = preload("res://game/NoiseLevel.tscn")
 const offset = Global.offsetv
 const size = Global.chunk_size
-var simplex = OpenSimplexNoise.new()
+var terrain_noise = OpenSimplexNoise.new()
+var biome_noise = OpenSimplexNoise.new()
 var chunks = {}
 var origin = Vector2(0, 0)
 enum biome {Underworld, Ground, Overworld}
@@ -16,11 +17,17 @@ func respawn(rsp):
 
 # initialize OpenSimplexNoise parameters
 func make_noise():
-	simplex.set_seed(13)
-	simplex.set_lacunarity(2.0)
-	simplex.set_octaves(1)
-	simplex.set_period(7.0)
-	simplex.set_persistence(1)
+	terrain_noise.set_seed(13)
+	terrain_noise.set_lacunarity(2.0)
+	terrain_noise.set_octaves(1)
+	terrain_noise.set_period(7.0)
+	terrain_noise.set_persistence(1)
+	biome_noise.set_seed(7)
+	biome_noise.set_lacunarity(1.0)
+	biome_noise.set_octaves(1)
+	biome_noise.set_period(20.0)
+	biome_noise.set_persistence(1)
+
 
 func gen_chunk(v):
 	if v in chunks.keys():
@@ -30,7 +37,8 @@ func gen_chunk(v):
 	lvl.position = (v * offset) - Vector2(Global.tile_size, Global.tile_size)
 	lvl.coords = v
 	lvl.ref = v * Vector2(size, size)
-	lvl.simplex = simplex
+	lvl.terrain_noise = terrain_noise
+	lvl.biome_noise = biome_noise
 	chunks[v] = lvl
 	call_deferred("add_child", lvl)
 

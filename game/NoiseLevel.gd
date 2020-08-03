@@ -9,7 +9,8 @@ const pix = Global.tile_size
 const hpix = Global.tile_size >> 1
 # Set by parent
 var coords
-var simplex
+var terrain_noise
+var biome_noise
 var ref
 var type
 # Auto Tile Consts
@@ -19,7 +20,9 @@ const LADDER = 7
 onready var noise = $Noise
 
 # apply procgen layers to create traversable map
-func _ready():
+func _ready() -> void:
+#	if int(coords.y) & 1:
+	noise.modulate = get_biome_color()
 	match type:
 		biome.Underworld:
 			gen_underworld()
@@ -28,29 +31,48 @@ func _ready():
 		biome.Overworld:
 			gen_overworld()
 
+func get_biome_color() -> Color:
+	# var colors = [
+	# 	Color(1, 0, 0, 1),
+	# 	Color(1, 1, 0, 1),
+	# 	Color(0, 1, 0, 1),
+	# 	Color(0, 1, 1, 1),
+	# 	Color(0, 0, 1, 1),
+		# Color(1, 0, 1, 1),
+		# ]
+	var hint = biome_noise.get_noise_2dv(coords)
+	if hint > 0.5:
+		return Color(1, 0, 0, 1)
+	if hint > 0:
+		return Color(1, 1, 0, 1)
+	if hint > -0.5:
+		return Color(0, 1, 0, 1)
+	return Color(0, 0, 1, 1)
+#	return colors[int(coords.x) % colors.size()]
+
 ### Start Sky Gen
-func gen_overworld():
+func gen_overworld() -> void:
 	pass
 
 ### Start Overworld Gen
-func gen_groundlevel():
+func gen_groundlevel() -> void:
 	make_buildings()
 	make_bottom()
 	pass
 
 # Create buildings on the overworld
-func make_buildings():
+func make_buildings() -> void:
 	pass
 
 # drop ladders to the underworld
-func make_bottom():
+func make_bottom() -> void:
 	var ground = []
 	var overlap = []
 	ground.resize(size + 1)
 	overlap.resize(size + 1)
 	for x in size + 1:
-		ground[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size - 2)))
-		overlap[x] = floor(simplex.get_noise_2dv(ref + Vector2(x, size - 1)))
+		ground[x] = floor(terrain_noise.get_noise_2dv(ref + Vector2(x, size - 2)))
+		overlap[x] = floor(terrain_noise.get_noise_2dv(ref + Vector2(x, size - 1)))
 	for x in size:
 		if ground[x] == EMPTY and ground[x + 1] == FILL:
 			make_ladder(x, size - 2, size - 2)
@@ -69,23 +91,23 @@ func make_bottom():
 	noise.set_cell(0, size - 2, -1)
 
 ### Level Generation
-func gen_underworld():
+func gen_underworld() -> void:
 	make_grid(size)
 #	clear_paths()
 	drop_ladders(size)
 	place_tiles(size)
 
-# create binary matrix from simplex noise floats
-func make_grid(height):
+# create binary matrix from terrain_noise noise floats
+func make_grid(height) -> void:
 	grid.resize(size)
 	for x in size:
 		grid[x] = []
 		grid[x].resize(height)
 		for y in size:
-			grid[x][y] = floor(simplex.get_noise_2dv(ref + Vector2(x, y)))
+			grid[x][y] = floor(terrain_noise.get_noise_2dv(ref + Vector2(x, y)))
 
 # TODO see if there's an efficient way to use bsq to find thin walls
-func clear_paths():
+func clear_paths() -> void:
 	var bsq = []
 	var maxsize = -1
 	var mx = 0
@@ -119,7 +141,7 @@ func clear_paths():
 							grid[x - i][y - j] = EMPTY
 
 # create Ladder objects at unjumpable overhangs
-func drop_ladders(height):
+func drop_ladders(height) -> void:
 	for x in range(1, size - 1):
 		for y in range(1, height - 1):
 			if grid[x][y] == EMPTY and grid[x][y + 1] == EMPTY and ( ( grid[x - 1][y] != EMPTY and grid[x - 1][y - 1] == EMPTY) or (grid[x + 1][y] != EMPTY and grid[x + 1][y - 1] == EMPTY)):
@@ -128,8 +150,8 @@ func drop_ladders(height):
 					drop += 1
 				make_ladder(x, y, drop)
 
-func make_ladder(x, y, drop):
-	while floor(simplex.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
+func make_ladder(x, y, drop) -> void:
+	while floor(terrain_noise.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
 		drop += 1
 	var height = drop - y
 	if height < 3:
@@ -149,7 +171,7 @@ func make_ladder(x, y, drop):
 	call_deferred("add_child", lad)
 
 # transform from integer grid to tilemap
-func place_tiles(height):
+func place_tiles(height) -> void:
 	# Set tiles
 	for x in size:
 		for y in height:
