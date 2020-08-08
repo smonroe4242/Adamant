@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://assets/fonts/compass-pro-v1.1/CompassPro.otf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/UI/close.png" type="Texture" id=2]
 [ext_resource path="res://assets/fonts/mainfont.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/bigwindow.png" type="Texture" id=4]
+[ext_resource path="res://assets/UI/ItemList.gd" type="Script" id=5]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 4 )
@@ -28,12 +29,12 @@ size = 8
 font_data = ExtResource( 1 )
 
 [node name="WindowDialog" type="WindowDialog"]
-visible = true
 margin_left = 190.161
 margin_top = 59.5251
 margin_right = 296.161
 margin_bottom = 210.525
 rect_min_size = Vector2( 106, 151 )
+mouse_filter = 2
 custom_icons/close = ExtResource( 2 )
 custom_styles/panel = SubResource( 1 )
 custom_fonts/title_font = ExtResource( 3 )
@@ -52,6 +53,7 @@ margin_bottom = 136.707
 custom_styles/bg_focus = SubResource( 3 )
 custom_styles/bg = SubResource( 4 )
 custom_fonts/font = SubResource( 5 )
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -61,7 +63,7 @@ margin_left = 16.0
 margin_top = 13.0
 margin_right = 89.0
 margin_bottom = 133.0
-mouse_filter = 1
+mouse_filter = 2
 custom_fonts/normal_font = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false

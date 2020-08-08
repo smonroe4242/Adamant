@@ -43,7 +43,6 @@ func _physics_process(_delta):
 			# client og code
 			if Input.is_action_pressed('block') and attacking != true:
 				_block(on_floor)
-				get_tree().get_root().get_node("/root/Root/UI/CanvasLayer")._character_sheet(self)
 			elif Input.is_action_just_released('block'):
 				_block_finish()
 			elif Input.is_action_pressed('attack') and not attacking:

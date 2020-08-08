@@ -9,11 +9,13 @@ var win = preload("res://assets/UI/window.tscn")
 
 var popups = [
 	win.instance(),
+	win.instance(),
 	win.instance()
 ]
 enum {
 	WELCOME,
-	CHAR_SHEET
+	CHAR_SHEET,
+	SYSTEM
 }
 
 # Called when the node enters the scene tree for the first time.
@@ -25,8 +27,12 @@ func _ready():
 	
 	popups[CHAR_SHEET].set_title("Character Sheet")
 	
+	popups[SYSTEM].set_title("System")
+	popups[SYSTEM].find_node("ItemList").connect('item_selected', self, 'system_select_item')
+	
 	add_child(popups[WELCOME])
 	add_child(popups[CHAR_SHEET])
+	add_child(popups[SYSTEM])
 	popups[WELCOME].popup()
 	pass # Replace with function body.
 	
@@ -42,6 +48,25 @@ func _character_sheet(p):
 #func _process(delta):
 #	pass
 
+func _system():
+	var list = popups[SYSTEM].find_node("ItemList")
+	list.clear()
+	list.add_item("About")
+	list.add_item("Logout")
+	list.add_item("Exit")
+	popups[SYSTEM].popup()
+
 func _on_TextureButton_pressed():
 	_character_sheet(Global.player_node)
 	pass # Replace with function body.
+
+func system_select_item(item):
+	if item == 2:
+		get_tree().network_peer = null
+		get_tree().quit(0)
+	print("callback")
+	pass
+
+func _process(delta):
+	if Input.is_action_just_pressed("ui_cancel"):
+		_system()
