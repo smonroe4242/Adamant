@@ -53,7 +53,7 @@ _global_script_class_icons={
 config/name="Adamant"
 config/description="A 2D platformer roguelike MMORPG with real time PvP and PvE, in an infinte procedurally generated world."
 run/main_scene="res://Entry.tscn"
-boot_splash/bg_color=Color( 0.109804, 0.2, 0.360784, 1 )
+boot_splash/bg_color=Color( 0, 0, 0, 1 )
 config/icon="res://assets/icon.png"
 
 [autoload]
@@ -160,5 +160,5 @@ limits/tcp/connect_timeout_seconds=10
 
 [rendering]
 
-environment/default_clear_color=Color( 0.121569, 0.172549, 0.352941, 1 )
+environment/default_clear_color=Color( 0, 0, 0, 1 )
 environment/default_environment="res://default_env.tres"

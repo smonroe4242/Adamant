@@ -1,6 +1,15 @@
 extends KinematicBody2D
 class_name Actor
 
+enum {
+	STATE_IDLE,
+	STATE_MOVE,
+	STATE_DEAD,
+	STATE_ATTACK,
+	STATE_BLOCK,
+	STATE_CLIMB,
+	STATE_AIR
+}
 const GRAV = 10
 var STEP = 150
 master var velocity := Vector2(0, 0)
@@ -10,6 +19,7 @@ master var hp
 master var max_hp
 master var blocking := false
 master var coords := Vector2(0, 0)
+master var state := STATE_IDLE
 var level := 0
 var respawn := Global.origin
 var displayName := "New Actor"
@@ -23,6 +33,7 @@ puppet var puppet_hp
 puppet var puppet_max_hp
 puppet var puppet_blocking := blocking
 puppet var puppet_coords := coords
+puppet var puppet_state := state
 onready var sprite = $AnimatedSprite
 onready var hitbox = $CollisionShape2D
 onready var weapon = $Weapon/CollisionShape2D
@@ -46,6 +57,7 @@ func _ready():
 	puppet_hp = hp
 	puppet_max_hp = max_hp
 	puppet_coords = coords
+	puppet_state = state
 	weapon.disabled = true
 	attack_timer = Timer.new()
 	attack_timer.set_name(displayName + "AttackTimer")
@@ -54,7 +66,10 @@ func _ready():
 	add_child(attack_timer)
 	sprite.animation = animation
 
-func set_vars(p, a, l, m, h, b):
+func set_vars(p, a, l, m, h, b, s):
+	if s != puppet_state:
+		puppet_state = s
+		rset_unreliable_id(1, 'state', s)
 	if p != puppet_position:
 		puppet_position = p
 #		print("Client: ", name, ": position changed")
@@ -85,6 +100,7 @@ func _attack_finish():
 	attack_timer.stop()
 	attacking = false
 	weapon.disabled = true
+	state = STATE_IDLE
 
 remote func _attack():
 	attacking = true
@@ -93,6 +109,7 @@ remote func _attack():
 		sprite.set_frame(0)
 	animation = "attack_light"
 	attack_timer.start()
+	state = STATE_ATTACK
 
 func _block(on_floor):
 	blocking = true
@@ -100,10 +117,12 @@ func _block(on_floor):
 	if on_floor:
 		velocity.x = 0
 		velocity.y = 0
+	state = STATE_BLOCK
 
 func _block_finish():
 	blocking = false
 	animation = "idle"
+	state = STATE_IDLE
 
 func _walk_left(on_floor):
 	velocity.x = -STEP
@@ -112,6 +131,7 @@ func _walk_left(on_floor):
 	if left_flip == false:
 		weapon.position.x = -weapon.position.x
 	left_flip = true
+	state = STATE_MOVE
 
 func _walk_right(on_floor):
 	velocity.x = STEP
@@ -120,26 +140,31 @@ func _walk_right(on_floor):
 	if left_flip == true:
 		weapon.position.x = -weapon.position.x
 		left_flip = false
+	state = STATE_MOVE
 
 func _hold_still(on_floor):
 	velocity.x = 0
 	if on_floor and !attacking:
 		animation = "idle"
+		state = STATE_IDLE
 
 func _jump():
 	velocity.y = -STEP
 	animation = "jump_start"
 	jumping = true
 	snap = Vector2(0, 0)
+	state = STATE_AIR
 
 func _fall():
 	animation = "jump_end"
 	sprite.stop()
+	state = STATE_AIR
 
 func _land():
 	animation = "jump_end"
 	jumping = false
 	snap = Vector2(0, 16)
+	state = STATE_IDLE
 
 func set_display_name(user):
 	displayName = user

@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://client/TopBar.gd" type="Script" id=1]
 [ext_resource path="res://assets/UI/hp_bar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://client/UI.gd" type="Script" id=3]
+[ext_resource path="res://assets/icon_container.png" type="Texture" id=4]
 
 [node name="UI" type="Control"]
 __meta__ = {
@@ -9,6 +11,22 @@ __meta__ = {
 }
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource( 3 )
+
+[node name="TextureButton" type="TextureButton" parent="CanvasLayer"]
+margin_left = 477.5
+margin_top = 97.0
+margin_right = 517.5
+margin_bottom = 137.0
+hint_tooltip = "Character Sheet"
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_disabled = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TopBar" type="MarginContainer" parent="CanvasLayer"]
 anchor_right = 1.0
@@ -19,10 +37,11 @@ __meta__ = {
 }
 
 [node name="LeaveButton" type="Button" parent="CanvasLayer/TopBar"]
-margin_right = 1024.0
+margin_right = 512.0
 margin_bottom = 20.0
 text = "Leave"
 
 [node name="Node2D" parent="." instance=ExtResource( 2 )]
 position = Vector2( 197.322, 73.761 )
+[connection signal="pressed" from="CanvasLayer/TextureButton" to="CanvasLayer" method="_on_TextureButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/TopBar/LeaveButton" to="CanvasLayer/TopBar" method="_on_LeaveButton_pressed"]

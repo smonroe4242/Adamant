@@ -1,7 +1,7 @@
 extends Node2D
 
 func _ready():
-	var editor_is_server = true
+	var editor_is_server = false
 	if editor_is_server:
 		if OS.has_feature("client"):
 			if get_tree().change_scene("res://client/Login.tscn"):
