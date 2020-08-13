@@ -1,6 +1,6 @@
 extends Node2D
 
-func _ready():
+func _ready() -> void:
 	var editor_is_server = false
 	if editor_is_server:
 		if OS.has_feature("client"):

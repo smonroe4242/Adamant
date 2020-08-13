@@ -51,7 +51,12 @@ func _client_disconnect(id):
 	if deadClient == null:
 		print("Server: Not a node in tree")
 		return
-	players[c.name].spawn = deadClient.position
+	var stats = players[c.user].stats
+	stats.position = deadClient.position
+	stats.max_hp = deadClient.max_hp
+	stats.hp = deadClient.hp
+	stats.xp = deadClient.xp
+	stats.level = deadClient.level
 # warning-ignore:unsafe_method_access
 	get_node("World").remove_dead_actor(id, deadClient.coords)
 	deadClient.queue_free()
@@ -59,43 +64,44 @@ func _client_disconnect(id):
 func validate_user(id, user, passwd):
 	if not players.has(user):
 		print("Server: New Player: ", user, " as ", id)
-		players[user] = {'passwd': hash(passwd), 'spawn': Global.origin}
+		players[user] = {'passwd': hash(passwd), 'stats':{'position': Global.origin, 'max_hp': 100, 'hp': 100, 'level': 1, 'xp': 0, 'user': user}}
 	else:
-		if current.has(user):
-			print("Server: ", user, " is attempting to log in twice")
-			rpc_id(id, "client_login_failed", "You can't log in twice")
-			return false
 		if players[user].passwd != hash(passwd):
 			print("Server: Bad login")
 			rpc_id(id, "client_login_failed", "Invalid username or passrod")
 			return false
+		for o in current.values():
+			if o.stats.user == user:
+				print("Server: ", user, " is attempting to log in twice")
+				rpc_id(id, "client_login_failed", "You can't log in twice")
+				return false
 	return true
 
 remote func server_validate_login(id, user, passwd):
 	if validate_user(id, user, passwd):
-		var spawn = players[user].spawn
-		load_player_server(id, user, spawn)
-		rpc_id(id, "load_world", spawn)
-		rpc_id(id, "load_player", id, user, spawn, 100, 100)
-		current[id] = {'id': id, 'name': user, 'spawn': spawn}
+		var stats = players[user].stats
+		load_player_server(id, stats)
+		rpc_id(id, "load_world", stats.position)
+		rpc_id(id, "load_player", id, stats)
+		current[id] = {'id': id, 'user': user, 'position': stats.position}
 
 func load_world_server():
 	print("Server: loading world")
 	var world = preload("res://server/ServerWorld.tscn").instance()
 	world.name = "World"
-	get_node(".").add_child(world)
+	add_child(world)
 
-func load_player_server(id, username, spawn):
+func load_player_server(id, stats):
 #	print("Server: loading player ", username)
 	var this_player = preload("res://server/ServerPlayer.tscn").instance()
 	this_player.set_name(str(id))
-	this_player.position = spawn
+	this_player.position = stats.position
 	this_player.rset_config('position', 1)
 	this_player.set_network_master(id)
 	this_player.actor_map = actor_map
-	this_player.username = username
-	this_player.max_hp = 100
-	this_player.hp = 100
+	this_player.username = stats.user
+	this_player.max_hp = stats.max_hp
+	this_player.hp = stats.hp
 	var world = get_node("./World")
 	world.actor_map = actor_map
 	world.monster_map = monster_map

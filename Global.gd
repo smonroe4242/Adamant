@@ -1,18 +1,35 @@
 extends Node2D
 # warning-ignore-all:unused_class_variable
-const server_port := 49152 # Port that game traffic goes through
-const tile_size := 16 # Pixel width of a tile
-const chunk_size := 16 # Tile wdith of a chunk
-const chunk_offset := chunk_size * tile_size # Pixel width of a chunk
-const offsetv := Vector2(chunk_offset, chunk_offset) # Pixel offset of a chunk
-const origin = offsetv + Vector2(64, -64) # Pixel coords of a new player's login spawn
-var server_ip := ""
-var username := ""
-var password := ""
-var error := ""
-var player_node = null
+const server_port : int = 49152 # Port that game traffic goes through
+const tile_size : int = 16 # Pixel width of a tile
+const chunk_size : int = 16 # Tile width of a chunk
+const chunk_offset : int = chunk_size * tile_size # Pixel width of a chunk
+const offsetv : Vector2 = Vector2(chunk_offset, chunk_offset) # Pixel offset of a chunk
+const origin : Vector2 = offsetv + Vector2(64, -64) # Pixel coords of a new player's login spawn
+var server_ip : String = ""
+var username : String = ""
+var password : String = ""
+var error : String = ""
+var player_node : Player = null
+const Cutoff : float = 0.1
+const terrain_seed : int = 13
+const terrain_lacunarity : float = 2.0
+const terrain_octaves : int = 1
+const terrain_period : float = 7.0
+const terrain_persistence : float = 1.0
+const biome_seed : int = 7
+const biome_lacunarity : float = 1.0
+const biome_octaves : int = 1
+const biome_period : float = 20.0
+const biome_persistence : float = 1.0
 
-func get_area(v):
+func set_player(player: Player) -> void:
+	player_node = player
+
+func get_player() -> Player:
+	return player_node
+
+func get_area(v: Vector2) -> Array:
 	return [
 		v,
 		v + Vector2.UP,
@@ -25,7 +42,7 @@ func get_area(v):
 		v + Vector2(1, 1),#Vector2.DOWN + Vector2.RIGHT,
 		]
 
-func get_area_around(v):
+func get_area_around(v: Vector2) -> Array:
 	return [
 		v + Vector2.LEFT,
 		v + Vector2.RIGHT,
@@ -37,7 +54,7 @@ func get_area_around(v):
 		v + Vector2(1, 1),#Vector2.DOWN + Vector2.RIGHT,
 		]
 
-#func get_big_area(v):
+#func get_big_area(v) -> Array:
 #	return [
 #		v,
 #		v + Vector2.UP,
@@ -65,7 +82,7 @@ func get_area_around(v):
 #		v + Vector2.DOWN + Vector2.LEFT,
 #		v + Vector2.DOWN + Vector2.RIGHT,
 #		]
-func set_err_msg(err, to_print = true):
+func set_err_msg(err: int, to_print : bool = true) -> void:
 	var msg = [
 	'Everything is fine.',
 	'Generic error.',

@@ -13,21 +13,20 @@ func _ready():
 	respawn(origin)
 
 func respawn(rsp):
-	gen_block(Vector2(int(rsp.x / offset.x), int(rsp.y / offset.y)))
+	gen_block(Vector2(floor(rsp.x / offset.x), floor(rsp.y / offset.y)))
 
 # initialize OpenSimplexNoise parameters
 func make_noise():
-	terrain_noise.set_seed(13)
-	terrain_noise.set_lacunarity(2.0)
-	terrain_noise.set_octaves(1)
-	terrain_noise.set_period(7.0)
-	terrain_noise.set_persistence(1)
-	biome_noise.set_seed(7)
-	biome_noise.set_lacunarity(1.0)
-	biome_noise.set_octaves(1)
-	biome_noise.set_period(20.0)
-	biome_noise.set_persistence(1)
-
+	terrain_noise.set_seed(Global.terrain_seed)
+	terrain_noise.set_lacunarity(Global.terrain_lacunarity)
+	terrain_noise.set_octaves(Global.terrain_octaves)
+	terrain_noise.set_period(Global.terrain_period)
+	terrain_noise.set_persistence(Global.terrain_persistence)
+	biome_noise.set_seed(Global.biome_seed)
+	biome_noise.set_lacunarity(Global.biome_lacunarity)
+	biome_noise.set_octaves(Global.biome_octaves)
+	biome_noise.set_period(Global.biome_period)
+	biome_noise.set_persistence(Global.biome_persistence)
 
 func gen_chunk(v):
 	if v in chunks.keys():
@@ -48,7 +47,7 @@ remote func load_actors(actors):
 			load_actor(actor)
 
 remote func load_actor(stats):#id, username, pos, mhp, hp):
-	print("Client: load_actor: ", stats)
+#	print("Client: load_actor: ", stats)
 	if not get_node(str(stats.id)) == null:
 		print("Client: load_actor(): player ", stats.id, " already in tree")
 		return
@@ -59,6 +58,7 @@ remote func load_actor(stats):#id, username, pos, mhp, hp):
 
 func set_stats_obj(node, stats):
 	node.set_name(str(stats.id))
+	node.level = stats.level
 	node.set_display_name(stats.user)
 	node.position = stats.position
 	node.animation = stats.animation
@@ -101,11 +101,12 @@ remote func load_monsters(names, chunk):
 
 remote func load_monster(node_name, level):
 	var mob = preload("res://game/Monster.tscn").instance()
-	mob.displayName = "BigBoi LVL" + str(level)
+	mob.displayName = "BigBoi"
 	mob.level = level
 	mob.name = node_name
 	mob.set_network_master(1)
-	call_deferred("add_child", mob)
+	add_child(mob)
+#	call_deferred("add_child", mob)
 
 remote func unload_monsters(names):
 	if not names == null:
@@ -117,6 +118,6 @@ remote func unload_monster(monster_name):
 	if not monster == null:
 		monster.queue_free()
 
-func player_entered(old_coords, new_coords, username):
-	rpc_id(1, "update_player_coords", old_coords, new_coords, username)
+func player_entered(old_coords, new_coords):
+	rpc_id(1, "update_player_coords", old_coords, new_coords)
 	gen_block(new_coords)

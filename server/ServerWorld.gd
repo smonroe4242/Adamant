@@ -14,6 +14,16 @@ var actor_map
 # monster_map[coord] = { m.name: m }
 var monster_map
 
+var terrain_noise : OpenSimplexNoise
+
+func _ready():
+	terrain_noise = OpenSimplexNoise.new()
+	terrain_noise.set_seed(Global.terrain_seed)
+	terrain_noise.set_lacunarity(Global.terrain_lacunarity)
+	terrain_noise.set_octaves(Global.terrain_octaves)
+	terrain_noise.set_period(Global.terrain_period)
+	terrain_noise.set_persistence(Global.terrain_persistence)
+
 func remove_dead_actor(actor_id, coords): # Can this be used for both disconnects and respawns?
 # Given a user and a chunk
 #   Tell all players that player is gone
@@ -62,12 +72,12 @@ func remove_dead_actor(actor_id, coords): # Can this be used for both disconnect
 				# We didn't find anyone to observe the monster, so it must not exist
 				despawn_monsters(chunk)
 
-remote func get_local_actors(coords, username):
+remote func get_local_actors(coords):
 	var actor_id = get_tree().get_rpc_sender_id()
 	for chunk in Global.get_area(coords):
 		if chunk in actor_map.keys():
 			# There are already players here
-			send_players(actor_id, username, chunk)
+			send_players(actor_id, chunk)
 			if chunk in monster_map.keys():
 				# There are already monsters too
 				send_monsters(actor_id, chunk)
@@ -84,6 +94,7 @@ remote func get_local_actors(coords, username):
 func get_stats_obj(node):
 	return {
 		'id': node.name,
+		'level': node.level,
 		'user': node.username,
 		'position': node.position,
 		'animation': node.animation,
@@ -92,7 +103,7 @@ func get_stats_obj(node):
 		'blocking': node.blocking
 	}
 
-remote func update_player_coords(old_coords, new_coords, username):
+remote func update_player_coords(old_coords, new_coords):
 #	print("UpdatePlayerCoords Entry Params: old_coords: ", old_coords, ", new_coords: ", new_coords, ", username: ", username)
 #	print("ACTOR_MAP:")
 #	print(actor_map)
@@ -117,7 +128,7 @@ remote func update_player_coords(old_coords, new_coords, username):
 		# Newly loaded tile
 			if actor_map.has(chunk):
 				# There are already players here
-				send_players(actor_id, username, chunk)
+				send_players(actor_id, chunk)
 				if monster_map.has(chunk):
 					# There are already monsters too
 					send_monsters(actor_id, chunk)
@@ -158,8 +169,8 @@ remote func update_player_coords(old_coords, new_coords, username):
 #	print("MONSTER_MAP After:")
 #	print(monster_map)
 
-func send_players(actor_id, username, chunk):
-#	print("send_players(", actor_id, ", ", username, ", ", chunk, "): ", actor_map[chunk].keys())
+func send_players(actor_id, chunk):
+#	print("send_players(", actor_id, ", ", chunk, "): ", actor_map[chunk].keys())
 # Given a user and a chunk:
 #   Tell the user about every player in the chunk
 #   Tell every player in the chunk about the user
@@ -176,31 +187,29 @@ func unload_players(actor_id, chunk):
 		rpc_id(player, "unload_actor", actor_id)
 	rpc_id(actor_id, "unload_actors", actor_map[chunk].keys())
 func spawn_monsters(chunk):
-	# for 0.1.0, no monsters
-	return
-#	print("spawn_monsters(", chunk, ")")
+#	print("Server: spawn_monsters(", chunk, ")")
 # Given a chunk
 #   Create a monster on the server
 #	if chunk.x < 1 or chunk.y < 1:
 #		return
+#	mob.position = Vector2(deep_x, deep_y)
 	var mob = preload("res://server/ServerMonster.tscn").instance()
 	mob.set_network_master(1)
 	mob.actor_map = actor_map
 	mob.monster_map = monster_map
 	mob.coords = chunk
-	mob.position = chunk * Global.offsetv
 	mob.name = "M" + str(mob.get_instance_id())
-	mob.level = chunk.y
-	mob.max_hp = chunk.y * 100
+	mob.level = abs(chunk.y)
+	mob.max_hp = mob.level * 100
 	mob.hp = mob.max_hp
+	mob.terrain = terrain_noise
+	mob.position = Vector2(0, 0)
 	call_deferred("add_child", mob)
 	if not monster_map.has(chunk):
 		monster_map[chunk] = {}
 	monster_map[chunk][mob.name] = mob
 func send_monsters(actor_id, chunk):
-	# for 0.1.0, no monsters
-	return
-#	print("send_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
+#	print("Server: send_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
 # Given a user and a chunk
 #   Tell the user about every monster in the chunk
 	if monster_map.has(chunk):
@@ -209,9 +218,7 @@ func send_monsters(actor_id, chunk):
 		print("Server: send_monsters(): ", chunk, " not found in monster_map")
 		print("Server: MonsterMap: ", monster_map)
 func unload_monsters(actor_id, chunk):
-	# for 0.1.0, no monsters
-	return
-#	print("unload_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
+#	print("Server: unload_monsters(", actor_id, ", ", chunk, "): ", monster_map[chunk])
 # Given a user and a chunk
 #   Tell the user to unload every monster in the chunk
 	if monster_map.has(chunk):
@@ -221,9 +228,7 @@ func unload_monsters(actor_id, chunk):
 		print("Server: MonsterMap: ", monster_map)
 
 func despawn_monsters(chunk):
-	# for 0.1.0, no monsters
-	return
-#	print("despawn_monsters(", chunk, "): ", monster_map[chunk])
+#	print("Server: despawn_monsters(", chunk, "): ", monster_map[chunk])
 # Given a chunk
 #   Remove every monster in the chunk from the server
 #   But only if nobody can see it
@@ -239,5 +244,6 @@ func despawn_monsters(chunk):
 	if not observed:
 		for monster in monster_map[chunk].values():
 	#		print("Server: despawn_monsters(): monster: ", monster)
-			monster.queue_free()
+			if monster:
+				monster.queue_free()
 		monster_map.erase(chunk)

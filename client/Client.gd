@@ -1,9 +1,9 @@
 extends Node2D
 # Called when the node enters the scene tree for the first time.
-func _enter_tree():
+func _enter_tree() -> void:
 	init_client()
 
-func init_client():
+func init_client() -> void:
 	var tree = get_tree()
 	var peer = NetworkedMultiplayerENet.new()
 	tree.connect("connected_to_server", self, "_server_connect")
@@ -15,19 +15,19 @@ func init_client():
 	tree.network_peer = peer
 	print("Client: READY")
 
-func _server_connect():
+func _server_connect() -> void:
 	print("Client: server connected")
 	rpc_id(1, "server_validate_login", get_tree().get_network_unique_id(), Global.username, Global.password)
 
-func _server_connect_fail():
+func _server_connect_fail() -> void:
 	print("Client: server connect failed")
 	client_login_failed("Failed to connect to realm")
 
-func _server_disconnect():
+func _server_disconnect() -> void:
 	print("Client: server disconnected")
 	client_login_failed("Disconnected from realm")
 
-remote func client_login_failed(err):
+remote func client_login_failed(err) -> void:
 	print("Client: Login failed")
 	if err is int:
 		Global.set_err_msg(err, true)
@@ -38,22 +38,22 @@ remote func client_login_failed(err):
 	else:
 		print("Client: Success changing to Login")
 
-remote func load_world(origin):
+remote func load_world(origin: Vector2) -> void:
 	var world = preload("res://game/World.tscn").instance()
 	world.origin = origin
 	get_node(".").add_child(world)
 
-remote func load_player(id, username, origin, max_hp, hp):
-	print("Client: loading player ", username)
+remote func load_player(id: int, stats: Dictionary) -> void:
+	print("Client: loading player ", stats.user)
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
-	this_player.set_display_name(username)
-	this_player.position = origin
-	this_player.max_hp = max_hp
-	this_player.hp = hp
+	this_player.level = stats.level
+	this_player.set_display_name(stats.user)
+	this_player.position = stats.position
+	this_player.max_hp = stats.max_hp
+	this_player.hp = stats.hp
 	this_player.set_network_master(id)
 	this_player.get_node("Camera2D").current = true
 	this_player.connect("player_entered", get_node("./World"), "player_entered")
-	Global.player_node = this_player
-	print("Client: LOAD_PLAYER: hp: ", this_player.hp, ", max_hp: ", this_player.max_hp)
+	Global.set_player(this_player)
 	get_node("./World").call_deferred("add_child", this_player)

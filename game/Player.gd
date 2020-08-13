@@ -1,7 +1,23 @@
 extends Actor
 class_name Player
 var climbing := int(0)
+var xp = 0
+remote var puppet_xp : int setget set_xp
+remote var puppet_level : int setget set_lvl
+
+func set_xp(new_xp):
+	print("SET XP: ", name, ": ", xp, " -> ", new_xp, " -> ", puppet_xp)
+	xp = new_xp
+	puppet_xp = new_xp
+
+func set_lvl(new_lvl):
+	print("SET LVL: ", name, ": ", level, " -> ", new_lvl, " -> ", puppet_level)
+	level = new_lvl
+	puppet_level = new_lvl
+	overhead.update_title(displayName, level)
+
 ### DEV ONLY
+onready var cam = $Camera2D
 var flying = false
 ### END DEV ONLY
 func _physics_process(_delta):
@@ -15,7 +31,7 @@ func _physics_process(_delta):
 		elif Input.is_action_pressed('fly') and flying:
 			flying = false
 			hitbox.disabled = false
-			$Camera2D.zoom = Vector2(1, 1)
+			cam.zoom = Vector2(1, 1)
 			STEP = 150
 			show()
 		if flying:
@@ -28,10 +44,10 @@ func _physics_process(_delta):
 			if Input.is_action_pressed('ui_down'):
 				velocity.y = STEP
 			if Input.is_action_pressed('attack'):
-				$Camera2D.zoom += Vector2(1, 1)
+				cam.zoom += Vector2(1, 1)
 				STEP += 100
 			if Input.is_action_pressed('block'):
-				$Camera2D.zoom -= Vector2(1, 1)
+				cam.zoom -= Vector2(1, 1)
 				STEP -= 100
 			velocity = move_and_slide(velocity, Vector2.UP)
 			update_coords()
@@ -78,24 +94,9 @@ func _physics_process(_delta):
 
 		if sprite.animation != animation:
 			sprite.play(animation)
-		set_vars(position, animation, left_flip, max_hp, hp, blocking)
+		set_vars()
 	else:
-		position = puppet_position
-		left_flip = puppet_left_flip
-		if sprite.animation != puppet_animation:
-#			print("Client: ", name, ": animation different: ", animation, " to ", puppet_animation)
-			animation = puppet_animation
-			sprite.animation = animation
-			sprite.play()
-		if max_hp != puppet_max_hp or hp != puppet_hp:
-			max_hp = puppet_max_hp
-			hp = puppet_hp
-			overhead.update_display(max_hp, hp)
-		if puppet_blocking != blocking:
-			if puppet_blocking:
-				_block(on_floor)
-			else:
-				_block_finish()
+		be_a_replica(on_floor)
 
 	sprite.set_flip_h(left_flip)
 
@@ -107,3 +108,15 @@ func _physics_process(_delta):
 		puppet_position = position
 	else:
 		update_coords()
+
+
+func respawn():
+	print("Client: Actor respawn ", name)
+	sprite.disconnect("animation_finished", self, "respawn")
+	hp = max_hp
+	overhead.update_healthbar(max_hp, hp)
+	if is_network_master():
+		position = respawn_point
+		update_coords()
+		get_parent().respawn(respawn_point)
+	animation = "idle"

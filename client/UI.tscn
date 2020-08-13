@@ -19,7 +19,7 @@ __meta__ = {
 }
 
 [node name="LeaveButton" type="Button" parent="CanvasLayer/TopBar"]
-margin_right = 1024.0
+margin_right = 512.0
 margin_bottom = 20.0
 text = "Leave"
 
