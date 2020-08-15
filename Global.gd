@@ -10,7 +10,7 @@ var server_ip : String = ""
 var username : String = ""
 var password : String = ""
 var error : String = ""
-var player_node : Player = null
+var player_node = null
 const Cutoff : float = 0.1
 const terrain_seed : int = 13
 const terrain_lacunarity : float = 2.0
@@ -23,10 +23,10 @@ const biome_octaves : int = 1
 const biome_period : float = 20.0
 const biome_persistence : float = 1.0
 
-func set_player(player: Player) -> void:
+func set_player(player) -> void:
 	player_node = player
 
-func get_player() -> Player:
+func get_player():
 	return player_node
 
 func get_area(v: Vector2) -> Array:

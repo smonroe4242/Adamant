@@ -22,7 +22,7 @@ var point_offset = Vector2(-0.5, -1)
 #	attack_timer.start()
 
 func _ready():
-	._ready()
+#	._ready()
 	make_path()
 
 func make_path():
@@ -58,7 +58,7 @@ func make_path():
 			break
 		path_idx += 1
 		path.push_front((base + point_offset) * path_offset)
-	path = PoolVector2Array(path)	
+	path = PoolVector2Array(path)
 	path_len = path.size() - 1
 
 func attack():
