@@ -39,8 +39,13 @@ func _ready():
 func _character_sheet(p):
 	var list = popups[CHAR_SHEET].find_node("ItemList")
 	list.clear()
-	list.add_item("Name   | " + p.displayName)
-	list.add_item("Health | " + str(p.hp))
+	list.add_item("Name     | " + p.displayName)
+	list.add_item("Health   | " + str(p.hp))
+	list.add_item("Strength | " + str(p.strength))
+	list.add_item("Intellect| " + str(p.intellect))
+	list.add_item("Wisdom   | " + str(p.wisdom))
+	list.add_item("Dexterity| " + str(p.dexterity))
+	list.add_item("Luck     | " + str(p.luck))
 	popups[CHAR_SHEET].popup()
 	pass
 

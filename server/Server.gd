@@ -1,5 +1,7 @@
 extends Node2D
 
+const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
+
 const MAX_PLAYERS = 200
 # Holds all players who have ever logged in
 # players = { str: { int, Vector2 } }
@@ -76,7 +78,7 @@ remote func server_validate_login(id, user, passwd):
 		var spawn = players[user].spawn
 		load_player_server(id, user, spawn)
 		rpc_id(id, "load_world", spawn)
-		rpc_id(id, "load_player", id, user, spawn, 100, 100)
+		rpc_id(id, "load_player", id, user, spawn, 100, 100, 11, 10, 12, 15, 13, 9)
 		current[id] = {'id': id, 'name': user, 'spawn': spawn}
 
 func load_world_server():

@@ -43,7 +43,7 @@ remote func load_world(origin):
 	world.origin = origin
 	get_node(".").add_child(world)
 
-remote func load_player(id, username, origin, max_hp, hp):
+remote func load_player(id, username, origin, max_hp, hp, strength, stamina, intellect, wisdom, dexterity, luck):
 	print("Client: loading player ", username)
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
@@ -51,6 +51,12 @@ remote func load_player(id, username, origin, max_hp, hp):
 	this_player.position = origin
 	this_player.max_hp = max_hp
 	this_player.hp = hp
+	this_player.strength = strength
+	this_player.stamina = stamina
+	this_player.intellect = intellect
+	this_player.wisdom = wisdom
+	this_player.dexterity = dexterity
+	this_player.luck = luck
 	this_player.set_network_master(id)
 	this_player.get_node("Camera2D").current = true
 	this_player.connect("player_entered", get_node("./World"), "player_entered")

@@ -3,7 +3,8 @@
 .mono/
 *.pck
 *.x86_64
-*,key
+*.key
+db/*.db
 GPATH
 GRTAGS
 GTAGS

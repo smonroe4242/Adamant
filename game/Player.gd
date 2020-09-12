@@ -78,7 +78,7 @@ func _physics_process(_delta):
 
 		if sprite.animation != animation:
 			sprite.play(animation)
-		set_vars(position, animation, left_flip, max_hp, hp, blocking, state)
+		set_vars(position, animation, left_flip, max_hp, hp, blocking, state, strength, stamina, intellect, wisdom, dexterity, luck)
 	else:
 		position = puppet_position
 		left_flip = puppet_left_flip

@@ -1,0 +1,37 @@
+ItemInstance:
+->	ItemBase:
+	->	Name: str
+	->	Slot: enum
+	->	Level: int
+	->	Damage: int
+	->	DamageType: enum
+	->	Armor: int
+	->	BaseAura: Aura (int, nullable)
+->	Aura (1-8):
+	->	Name: str
+	->	Prefix: str
+	->	Affix: str
+	->	Persistent: bool
+	->	Duration: double
+	->	Period: double
+	->	Chance: float
+	->	Effect:
+		->	Status: enum
+		->	Damage: int
+		->	DamageType: enum
+		->	Health: int
+		->	Mana: int
+		->	Strength: int
+		->	Stamina: int
+		->	Intellect: int
+		->	Wisdom: int
+		->	Dexterity: int
+		->	Luck: int
+	->	Caster: Actor
+
+Ability:
+->	Name: str
+->	Cost: int
+->	CostType: enum
+->	Effect (1-4): Effect
+->	Aura (1-4): Aura

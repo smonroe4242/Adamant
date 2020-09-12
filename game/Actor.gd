@@ -17,6 +17,12 @@ master var animation := "idle"
 master var left_flip := false
 master var hp
 master var max_hp
+master var strength
+master var stamina
+master var intellect
+master var wisdom
+master var dexterity
+master var luck
 master var blocking := false
 master var coords := Vector2(0, 0)
 master var state := STATE_IDLE
@@ -31,6 +37,12 @@ puppet var puppet_animation := animation
 puppet var puppet_left_flip := left_flip
 puppet var puppet_hp
 puppet var puppet_max_hp
+puppet var puppet_strength
+puppet var puppet_stamina
+puppet var puppet_intellect
+puppet var puppet_wisdom
+puppet var puppet_dexterity
+puppet var puppet_luck
 puppet var puppet_blocking := blocking
 puppet var puppet_coords := coords
 puppet var puppet_state := state
@@ -56,6 +68,12 @@ func _ready():
 	puppet_left_flip = left_flip
 	puppet_hp = hp
 	puppet_max_hp = max_hp
+	puppet_strength = strength
+	puppet_stamina = stamina
+	puppet_intellect = intellect
+	puppet_wisdom = wisdom
+	puppet_dexterity = dexterity
+	puppet_luck = luck
 	puppet_coords = coords
 	puppet_state = state
 	weapon.disabled = true
@@ -66,7 +84,7 @@ func _ready():
 	add_child(attack_timer)
 	sprite.animation = animation
 
-func set_vars(p, a, l, m, h, b, s):
+func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _dexterity, _luck):
 	if s != puppet_state:
 		puppet_state = s
 		rset_unreliable_id(1, 'state', s)
@@ -94,6 +112,31 @@ func set_vars(p, a, l, m, h, b, s):
 		puppet_blocking = b
 #		print("Client: ", name, ": blocking changed")
 		rset_id(1, 'blocking', b)
+	if _strength != puppet_strength:
+		puppet_strength = _strength
+		print("Client: ", name, ": strength changed")
+		rset_id(1, 'strength', _strength)
+	if _stamina != puppet_stamina:
+		puppet_stamina = _stamina
+		print("Client: ", name, ": stamina changed")
+		rset_id(1, 'stamina', _stamina)
+	if _intellect != puppet_intellect:
+		puppet_intellect = _intellect
+		print("Client: ", name, ": intellect changed")
+		rset_id(1, 'intellect', _intellect)
+	if _wisdom != puppet_wisdom:
+		puppet_wisdom = _wisdom
+		print("Client: ", name, ": wisdom changed")
+		rset_id(1, 'wisdom', _wisdom)
+	if _dexterity != puppet_dexterity:
+		puppet_dexterity = _dexterity
+		print("Client: ", name, ": dexterity changed")
+		rset_id(1, 'dexterity', _dexterity)
+	if _luck != puppet_luck:
+		puppet_luck = _luck
+		print("Client: ", name, ": luck changed")
+		rset_id(1, 'luck', _luck)
+		
 
 func _attack_finish():
 	animation = "idle"
