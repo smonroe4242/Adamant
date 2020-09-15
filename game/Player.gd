@@ -103,6 +103,7 @@ func _physics_process(_delta):
 		velocity = move_and_slide_with_snap(velocity, snap, Vector2.UP, true, 1, rad2deg(50))
 	else:
 		velocity = move_and_slide(velocity, Vector2.UP)
+		
 	if not is_network_master():
 		puppet_position = position
 	else:

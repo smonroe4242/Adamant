@@ -17,12 +17,12 @@ master var animation := "idle"
 master var left_flip := false
 master var hp
 master var max_hp
-master var strength
-master var stamina
-master var intellect
-master var wisdom
-master var dexterity
-master var luck
+remote var strength
+remote var stamina
+remote var intellect
+remote var wisdom
+remote var dexterity
+remote var luck
 master var blocking := false
 master var coords := Vector2(0, 0)
 master var state := STATE_IDLE
@@ -31,21 +31,21 @@ var respawn := Global.origin
 var displayName := "New Actor"
 var jumping = false
 var snap := Vector2(0, 16)
-puppet var puppet_position := position
-puppet var puppet_velocity := velocity
-puppet var puppet_animation := animation
-puppet var puppet_left_flip := left_flip
-puppet var puppet_hp
-puppet var puppet_max_hp
-puppet var puppet_strength
-puppet var puppet_stamina
-puppet var puppet_intellect
-puppet var puppet_wisdom
-puppet var puppet_dexterity
-puppet var puppet_luck
-puppet var puppet_blocking := blocking
-puppet var puppet_coords := coords
-puppet var puppet_state := state
+remote var puppet_position := position
+remote var puppet_velocity := velocity
+remote var puppet_animation := animation
+remote var puppet_left_flip := left_flip
+remote var puppet_hp
+remote var puppet_max_hp
+remote var puppet_strength
+remote var puppet_stamina
+remote var puppet_intellect
+remote var puppet_wisdom
+remote var puppet_dexterity
+remote var puppet_luck
+remote var puppet_blocking := blocking
+remote var puppet_coords := coords
+remote var puppet_state := state
 onready var sprite = $AnimatedSprite
 onready var hitbox = $CollisionShape2D
 onready var weapon = $Weapon/CollisionShape2D
@@ -112,30 +112,26 @@ func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _de
 		puppet_blocking = b
 #		print("Client: ", name, ": blocking changed")
 		rset_id(1, 'blocking', b)
+	#stats get set to puppet vars as they are controlled by server???
 	if _strength != puppet_strength:
-		puppet_strength = _strength
-		print("Client: ", name, ": strength changed")
-		rset_id(1, 'strength', _strength)
+		print("Client: ", name, " changed strength: ", _strength, " -> ", puppet_strength)
+		strength = puppet_strength
+		rset_id(1, 'strength', puppet_strength)
 	if _stamina != puppet_stamina:
-		puppet_stamina = _stamina
-		print("Client: ", name, ": stamina changed")
-		rset_id(1, 'stamina', _stamina)
+		stamina = puppet_stamina
+		rset_id(1, 'stamina', puppet_stamina)
 	if _intellect != puppet_intellect:
-		puppet_intellect = _intellect
-		print("Client: ", name, ": intellect changed")
-		rset_id(1, 'intellect', _intellect)
+		intellect = puppet_intellect
+		rset_id(1, 'intellect', puppet_intellect)
 	if _wisdom != puppet_wisdom:
-		puppet_wisdom = _wisdom
-		print("Client: ", name, ": wisdom changed")
-		rset_id(1, 'wisdom', _wisdom)
+		wisdom = puppet_wisdom
+		rset_id(1, 'wisdom', puppet_wisdom)
 	if _dexterity != puppet_dexterity:
-		puppet_dexterity = _dexterity
-		print("Client: ", name, ": dexterity changed")
-		rset_id(1, 'dexterity', _dexterity)
+		dexterity = puppet_dexterity
+		rset_id(1, 'dexterity', puppet_dexterity)
 	if _luck != puppet_luck:
-		puppet_luck = _luck
-		print("Client: ", name, ": luck changed")
-		rset_id(1, 'luck', _luck)
+		luck = puppet_luck
+		rset_id(1, 'luck', puppet_luck)
 		
 
 func _attack_finish():
@@ -248,3 +244,7 @@ func _on_Weapon_body_entered(body):
 	if body.has_method("damage") and body.name != name:
 		print("Client:  with actor ", body.name)
 		rpc_id(1, "request_damage", body.name)
+
+func _process(delta):
+	#print(puppet_strength)
+	pass

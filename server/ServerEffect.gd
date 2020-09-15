@@ -45,6 +45,24 @@ var luck		= 0
 func _ready():
 	pass # Replace with function body.
 
+func apply(actor):
+	actor.hp -= damage
+	actor.hp += health
+	actor.mana += mana
+	actor.strength += strength
+	actor.stamina += stamina
+	actor.intellect += intellect
+	actor.wisdom += wisdom
+	actor.dexterity += dexterity
+	actor.luck += luck
+
+func remove(actor):
+	actor.strength -= strength
+	actor.stamina -= stamina
+	actor.intellect -= intellect
+	actor.wisdom -= wisdom
+	actor.dexterity -= dexterity
+	actor.luck -= luck
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

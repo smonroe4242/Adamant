@@ -21,6 +21,8 @@ remote var left_flip := false
 
 remote var hp := 59
 remote var max_hp := 59
+remote var mana := 0
+remote var max_mana := 0
 remote var strength := 10
 remote var stamina := 10
 remote var intellect := 10
@@ -39,6 +41,8 @@ remote var puppet_left_flip := left_flip
 
 remote var puppet_hp := hp
 remote var puppet_max_hp := max_hp
+remote var puppet_mana := mana
+remote var puppet_max_mana := max_mana
 remote var puppet_strength := strength
 remote var puppet_stamina := stamina
 remote var puppet_intellect := intellect
@@ -68,6 +72,7 @@ func _ready():
 	puppet_luck = luck
 	puppet_state = state
 	puppet_coords = coords
+	puppet_effects = effects
 ### TODO master and pupper
 #remote
 func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _dexterity, _luck):
@@ -93,6 +98,7 @@ func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _
 		rset_id(id, 'puppet_state', s)
 	if puppet_strength != strength:
 		rset_id(id, 'puppet_strength', _strength)
+		print(strength, " | puppet: ", puppet_strength, " _: ", _strength)
 	if puppet_stamina != stamina:
 		rset_id(id, 'puppet_stamina', _stamina)
 	if puppet_intellect != intellect:
@@ -127,3 +133,14 @@ func damage(amt):
 func die():
 	# Implemented in subclasses
 	pass
+
+func _process(delta):
+	var to_remove = []
+	for i in effects.size():
+		if effects[i].finished == true:
+			effects[i].remove(self)
+			to_remove.push_front(i)
+	for i in to_remove:
+		remove_child(effects[i])
+		effects.remove(i)
+	#print("name: ", name, " str: ", strength)

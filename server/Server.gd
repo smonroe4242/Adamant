@@ -76,9 +76,19 @@ func validate_user(id, user, passwd):
 remote func server_validate_login(id, user, passwd):
 	if validate_user(id, user, passwd):
 		var spawn = players[user].spawn
-		load_player_server(id, user, spawn)
+		var new_player = load_player_server(id, user, spawn)
 		rpc_id(id, "load_world", spawn)
-		rpc_id(id, "load_player", id, user, spawn, 100, 100, 11, 10, 12, 15, 13, 9)
+		print(new_player.strength)
+		rpc_id(id, "load_player", id, user, spawn, 
+			new_player.hp, 
+			new_player.max_hp, 
+			new_player.strength, 
+			new_player.stamina, 
+			new_player.intellect,
+			new_player.wisdom,
+			new_player.dexterity,
+			new_player.luck
+		)
 		current[id] = {'id': id, 'name': user, 'spawn': spawn}
 
 func load_world_server():
@@ -102,3 +112,4 @@ func load_player_server(id, username, spawn):
 	world.actor_map = actor_map
 	world.monster_map = monster_map
 	world.call_deferred("add_child", this_player)
+	return this_player
