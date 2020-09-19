@@ -85,9 +85,11 @@ func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _
 	if puppet_left_flip != left_flip:
 #		print("Server: telling ", id, "that left_flip changed")
 		rset_id(id, 'puppet_left_flip', l)
-	if puppet_max_hp != max_hp:
-#		print("Server: telling ", id, "that max_hp changed to ", m)
-		rset_id(id, 'puppet_max_hp', m)
+	if puppet_stamina != stamina:
+		rset_id(id, 'puppet_stamina', _stamina)
+		rset_id(id, 'puppet_max_hp', _stamina * 10)
+		print(stamina, " | puppet: ", puppet_stamina, " _: ", _stamina)
+		print(puppet_max_hp, "|", max_hp, "|", m)
 	if puppet_hp != hp:
 #		print("Server: telling ", id, "that hp changed to ", h)
 		rset_id(id, 'puppet_hp', h)
@@ -99,8 +101,6 @@ func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _
 	if puppet_strength != strength:
 		rset_id(id, 'puppet_strength', _strength)
 		print(strength, " | puppet: ", puppet_strength, " _: ", _strength)
-	if puppet_stamina != stamina:
-		rset_id(id, 'puppet_stamina', _stamina)
 	if puppet_intellect != intellect:
 		rset_id(id, 'puppet_intellect', _intellect)
 	if puppet_wisdom != wisdom:
@@ -144,3 +144,6 @@ func _process(delta):
 		remove_child(effects[i])
 		effects.remove(i)
 	#print("name: ", name, " str: ", strength)
+
+func evaluate_stats():
+	max_hp = stamina * 10

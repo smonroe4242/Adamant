@@ -53,7 +53,7 @@ func _client_disconnect(id):
 	if deadClient == null:
 		print("Server: Not a node in tree")
 		return
-	players[c.name].spawn = deadClient.position
+	players[c.name].characters[players[c.name].char_selection].spawn = deadClient.position
 # warning-ignore:unsafe_method_access
 	get_node("World").remove_dead_actor(id, deadClient.coords)
 	deadClient.queue_free()
@@ -61,7 +61,7 @@ func _client_disconnect(id):
 func validate_user(id, user, passwd):
 	if not players.has(user):
 		print("Server: New Player: ", user, " as ", id)
-		players[user] = {'passwd': hash(passwd), 'spawn': Global.origin}
+		players[user] = {'passwd': hash(passwd), 'spawn': Global.origin, 'characters': []}
 	else:
 		if current.has(user):
 			print("Server: ", user, " is attempting to log in twice")
@@ -75,21 +75,43 @@ func validate_user(id, user, passwd):
 
 remote func server_validate_login(id, user, passwd):
 	if validate_user(id, user, passwd):
-		var spawn = players[user].spawn
-		var new_player = load_player_server(id, user, spawn)
-		rpc_id(id, "load_world", spawn)
-		print(new_player.strength)
-		rpc_id(id, "load_player", id, user, spawn, 
-			new_player.hp, 
-			new_player.max_hp, 
-			new_player.strength, 
-			new_player.stamina, 
-			new_player.intellect,
-			new_player.wisdom,
-			new_player.dexterity,
-			new_player.luck
-		)
-		current[id] = {'id': id, 'name': user, 'spawn': spawn}
+		rpc_id(id, "client_load_character_list", players[user].characters)
+
+remote func server_create_character(id, user, _name, _class):
+	var new_character = {'class': _class, 'name': _name, 'level': 1}
+	players[user].characters.push_back(new_character)
+	initialize_client(id, user, players[user].characters.size() - 1)
+
+remote func server_select_character(id, user, character):
+	initialize_client(id, user, character)
+
+func initialize_client(id, user, character):
+	var spawn
+	if !players[user].characters[character].has('spawn'):
+		spawn = players[user].spawn
+	else:
+		spawn = players[user].characters[character].spawn
+	var new_player = load_player_server(id, players[user].characters[character].name, spawn)
+	rpc_id(id, "load_world", spawn)
+	new_player.char_selection = character
+	rpc_id(id, "load_player", id, players[user].characters[character].name, spawn, 
+		new_player.hp, 
+		new_player.max_hp, 
+		new_player.strength, 
+		new_player.stamina, 
+		new_player.intellect,
+		new_player.wisdom,
+		new_player.dexterity,
+		new_player.luck,
+		players[user].characters[character].class,
+		players[user].characters[character].level
+	)
+	new_player.evaluate_stats()
+	current[id] = {'id': id, 'name': players[user].characters[character].name, 'spawn': spawn}
+	pass
+
+remote func server_new_character(id, user, _class, _name):
+	players[user].characters.push_back({'class': _class, 'name': _name, 'level': 1})
 
 func load_world_server():
 	print("Server: loading world")
@@ -106,8 +128,8 @@ func load_player_server(id, username, spawn):
 	this_player.set_network_master(id)
 	this_player.actor_map = actor_map
 	this_player.username = username
-	this_player.max_hp = 100
-	this_player.hp = 100
+	this_player.max_hp = this_player.stamina * 10
+	this_player.hp = this_player.stamina * 10
 	var world = get_node("./World")
 	world.actor_map = actor_map
 	world.monster_map = monster_map

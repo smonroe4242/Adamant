@@ -42,6 +42,7 @@ func _character_sheet(p):
 	list.add_item("Name     | " + p.displayName)
 	list.add_item("Health   | " + str(p.hp))
 	list.add_item("Strength | " + str(p.strength))
+	list.add_item("Stamina | " + str(p.stamina))
 	list.add_item("Intellect| " + str(p.intellect))
 	list.add_item("Wisdom   | " + str(p.wisdom))
 	list.add_item("Dexterity| " + str(p.dexterity))

@@ -1,17 +1,25 @@
 extends ServerActor
 
+enum CLASSES {
+	WARRIOR,
+	ARCHER,
+	WIZARD
+}
+
 var testaura
+var classtype = CLASSES.WARRIOR
+var char_selection = 0
 
 func _init():
 	var _aura = load("res://server/ServerAura.gd").new()
 	var _effect = load("res://server/ServerEffect.gd").new()
 	_aura.duration = 3.0
-	_effect.strength = 5
+	_effect.stamina = 5
 	_aura.effect = _effect
 	effects.push_back(_aura)
-	print("Before: ", self.strength)
+	print("Before: ", self.stamina)
 	_aura.apply(self)
-	print("After: ", self.strength)
+	print("After: ", self.stamina)
 	testaura = _aura
 
 func _ready():

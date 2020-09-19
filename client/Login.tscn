@@ -1,32 +1,43 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://assets/fonts/compass-pro-v1.1/CompassPro.otf" type="DynamicFontData" id=1]
 [ext_resource path="res://client/Login.gd" type="Script" id=2]
+[ext_resource path="res://assets/UI/input_texture_focus.tres" type="StyleBox" id=3]
+[ext_resource path="res://assets/UI/window.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/s4m_ur4i-2D-gothic-soulslike_tileset.png" type="Texture" id=5]
+[ext_resource path="res://assets/UI/input_texture_normal.tres" type="StyleBox" id=6]
+[ext_resource path="res://assets/fonts/mainfont.tres" type="DynamicFont" id=7]
+[ext_resource path="res://client/classes_list.gd" type="Script" id=8]
 
 [sub_resource type="DynamicFont" id=1]
-size = 96
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=2]
-font_data = ExtResource( 1 )
+[sub_resource type="StyleBoxEmpty" id=2]
 
 [sub_resource type="DynamicFont" id=3]
+size = 64
 font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=4]
 font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=5]
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=6]
 extra_spacing_top = 4
 font_data = ExtResource( 1 )
+
+[sub_resource type="TileSet" id=7]
 
 [node name="Login" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = -0.594604
+margin_bottom = -0.594604
 script = ExtResource( 2 )
 __meta__ = {
 "_edit_group_": true,
-"_edit_lock_": true,
 "_edit_use_anchors_": false
 }
 
@@ -39,54 +50,130 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GridContainer" type="GridContainer" parent="CanvasLayer/CenterContainer"]
-margin_left = 359.0
-margin_top = 187.0
-margin_right = 665.0
-margin_bottom = 412.0
+[node name="CharacterCreateDialog" parent="CanvasLayer/CenterContainer" instance=ExtResource( 4 )]
+margin_left = 172.0
+margin_top = 68.0
+margin_right = 339.0
+margin_bottom = 219.0
+window_title = "Character Creation"
 
-[node name="Title" type="Label" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_right = 306.0
-margin_bottom = 90.0
+[node name="cname" type="LineEdit" parent="CanvasLayer/CenterContainer/CharacterCreateDialog"]
+margin_left = 19.0
+margin_top = 100.0
+margin_right = 149.0
+margin_bottom = 117.0
+rect_min_size = Vector2( 130, 17 )
+hint_tooltip = "username"
+custom_styles/focus = ExtResource( 3 )
+custom_styles/normal = ExtResource( 6 )
 custom_fonts/font = SubResource( 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_offset_x = 4
-custom_constants/shadow_offset_y = 4
-custom_constants/shadow_as_outline = 0
-text = "Adamant"
+placeholder_text = "name"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="server" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 94.0
-margin_right = 306.0
-margin_bottom = 119.0
+[node name="classes" type="ItemList" parent="CanvasLayer/CenterContainer/CharacterCreateDialog"]
+margin_left = 87.0
+margin_top = 20.0
+margin_right = 147.0
+margin_bottom = 90.0
+custom_styles/bg = SubResource( 2 )
+custom_fonts/font = ExtResource( 7 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="CanvasLayer/CenterContainer/CharacterCreateDialog"]
+margin_left = 50.0
+margin_top = 120.0
+margin_right = 120.0
+margin_bottom = 140.0
+custom_fonts/font = ExtResource( 7 )
+text = "Create!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CharacterDialog" parent="CanvasLayer/CenterContainer" instance=ExtResource( 4 )]
+visible = true
+margin_left = 170.0
+margin_top = 68.0
+margin_right = 341.0
+margin_bottom = 219.0
+window_title = "Character Selection"
+
+[node name="WindowDialog" parent="CanvasLayer/CenterContainer" instance=ExtResource( 4 )]
+margin_left = 171.0
+margin_top = 68.0
+margin_right = 341.0
+margin_bottom = 219.0
+rect_min_size = Vector2( 170, 151 )
+popup_exclusive = true
+window_title = "Login"
+resizable = false
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/CenterContainer/WindowDialog"]
+margin_left = 20.0
+margin_top = 25.0
+margin_right = 150.0
+margin_bottom = 132.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+visible = false
+margin_right = 204.0
+margin_bottom = 123.0
+custom_fonts/font = SubResource( 3 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+text = "Adamant
+"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="server" type="LineEdit" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+margin_right = 130.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 130, 17 )
 hint_tooltip = "username"
-custom_fonts/font = SubResource( 2 )
+custom_styles/focus = ExtResource( 3 )
+custom_styles/normal = ExtResource( 6 )
+custom_fonts/font = SubResource( 1 )
 text = "127.0.0.1"
 placeholder_text = "server ip"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="user" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 123.0
-margin_right = 306.0
-margin_bottom = 148.0
+[node name="user" type="LineEdit" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+margin_top = 21.0
+margin_right = 130.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 130, 17 )
 hint_tooltip = "username"
-custom_fonts/font = SubResource( 2 )
+custom_styles/focus = ExtResource( 3 )
+custom_styles/normal = ExtResource( 6 )
+custom_fonts/font = SubResource( 1 )
 placeholder_text = "username"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="passwd" type="LineEdit" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 152.0
-margin_right = 306.0
-margin_bottom = 177.0
+[node name="passwd" type="LineEdit" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+margin_top = 42.0
+margin_right = 130.0
+margin_bottom = 59.0
+rect_min_size = Vector2( 130, 17 )
 hint_tooltip = "password"
-custom_fonts/font = SubResource( 3 )
+custom_styles/focus = ExtResource( 3 )
+custom_styles/normal = ExtResource( 6 )
+custom_fonts/font = SubResource( 4 )
 secret = true
 shortcut_keys_enabled = false
 selecting_enabled = false
@@ -95,25 +182,40 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Button" type="Button" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 181.0
-margin_right = 306.0
-margin_bottom = 202.0
-custom_fonts/font = SubResource( 4 )
+[node name="Button" type="Button" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+margin_top = 63.0
+margin_right = 130.0
+margin_bottom = 84.0
+rect_min_size = Vector2( 130, 21 )
+custom_fonts/font = SubResource( 5 )
 text = "Enter Realm"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Error" type="Label" parent="CanvasLayer/CenterContainer/GridContainer"]
-margin_top = 206.0
-margin_right = 306.0
-margin_bottom = 225.0
-custom_fonts/font = SubResource( 5 )
+[node name="Error" type="Label" parent="CanvasLayer/CenterContainer/WindowDialog/GridContainer"]
+margin_top = 88.0
+margin_right = 130.0
+margin_bottom = 107.0
+custom_fonts/font = SubResource( 6 )
 custom_colors/font_color = Color( 1, 0, 0, 1 )
 align = 1
 valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="CanvasLayer/CenterContainer/GridContainer/Button" to="." method="_on_Button_pressed"]
+
+[node name="TileMap" type="TileMap" parent="."]
+visible = false
+tile_set = SubResource( 7 )
+cell_size = Vector2( 16, 16 )
+format = 1
+
+[node name="Sprite" type="Sprite" parent="."]
+visible = false
+position = Vector2( 262, 200 )
+scale = Vector2( 6, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 465.643, 126.992, 45.1249, 43.7443 )
+[connection signal="pressed" from="CanvasLayer/CenterContainer/WindowDialog/GridContainer/Button" to="." method="_on_Button_pressed"]

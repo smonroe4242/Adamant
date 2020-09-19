@@ -1,9 +1,9 @@
 extends Control
 
-onready var server = $CanvasLayer/CenterContainer/GridContainer/server
-onready var user = $CanvasLayer/CenterContainer/GridContainer/user
-onready var passwd = $CanvasLayer/CenterContainer/GridContainer/passwd
-onready var error = $CanvasLayer/CenterContainer/GridContainer/Error
+onready var server = $CanvasLayer/CenterContainer/WindowDialog/GridContainer/server
+onready var user = $CanvasLayer/CenterContainer/WindowDialog/GridContainer/user
+onready var passwd = $CanvasLayer/CenterContainer/WindowDialog/GridContainer/passwd
+onready var error = $CanvasLayer/CenterContainer/WindowDialog/GridContainer/Error
 
 func _ready():
 	server.text = "127.0.0.1"
@@ -14,6 +14,7 @@ func _ready():
 		user.grab_focus()
 	elif passwd.text == "":
 		passwd.grab_focus()
+	$CanvasLayer/CenterContainer/WindowDialog.popup()
 
 func _on_Button_pressed():
 	var ip = IP.resolve_hostname(server.text, 1)

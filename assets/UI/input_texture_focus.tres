@@ -1,0 +1,11 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=2]
+
+[ext_resource path="res://assets/s4m_ur4i-2D-gothic-soulslike_tileset.png" type="Texture" id=1]
+
+[resource]
+texture = ExtResource( 1 )
+region_rect = Rect2( 400.738, 257.04, 70.2533, 12.9433 )
+margin_left = 2.0
+margin_right = 2.0
+margin_top = 1.0
+margin_bottom = 1.0

@@ -1,6 +1,8 @@
 extends Node2D
+var character_options = []
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
+	$UI/CanvasLayer/TextureButton.hide()
 	init_client()
 
 func init_client():
@@ -26,6 +28,24 @@ func _server_connect_fail():
 func _server_disconnect():
 	print("Client: server disconnected")
 	client_login_failed("Disconnected from realm")
+	
+func create_character(user, _name, _class):
+	Global.character_name = _name
+	rpc_id(1, "server_create_character", get_tree().get_network_unique_id(), user, _name, _class)
+
+func select_character(user, character):
+	Global.character_name = character_options[character].name
+	rpc_id(1, "server_select_character", get_tree().get_network_unique_id(), user, character)
+
+remote func client_load_character_list(characters):
+	if characters == null or characters.size() == 0:
+		$CharCreate.popup()
+	else:
+		character_options = characters
+		for character in characters:
+			$CharSelect/ItemList.add_item(character.name + ", level " + str(character.level) + " " + Global.class_strings[character.class])
+		$CharSelect.popup()
+	pass
 
 remote func client_login_failed(err):
 	print("Client: Login failed")
@@ -42,8 +62,9 @@ remote func load_world(origin):
 	var world = preload("res://game/World.tscn").instance()
 	world.origin = origin
 	get_node(".").add_child(world)
+	$UI/CanvasLayer/TextureButton.show()
 
-remote func load_player(id, username, origin, max_hp, hp, strength, stamina, intellect, wisdom, dexterity, luck):
+remote func load_player(id, username, origin, max_hp, hp, strength, stamina, intellect, wisdom, dexterity, luck, _class, level):
 	print("Client: loading player ", username)
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
@@ -57,9 +78,11 @@ remote func load_player(id, username, origin, max_hp, hp, strength, stamina, int
 	this_player.wisdom = wisdom
 	this_player.dexterity = dexterity
 	this_player.luck = luck
+	this_player.classtype = _class
+	this_player.level = level
 	this_player.set_network_master(id)
 	this_player.get_node("Camera2D").current = true
 	this_player.connect("player_entered", get_node("./World"), "player_entered")
 	Global.player_node = this_player
-	print("Client: LOAD_PLAYER: hp: ", this_player.hp, ", max_hp: ", this_player.max_hp)
+	print("Client: LOAD_PLAYER: hp: ", this_player.hp, ", max_hp: ", this_player.max_hp, ", stam: ", this_player.stamina)
 	get_node("./World").call_deferred("add_child", this_player)

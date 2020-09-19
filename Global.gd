@@ -11,6 +11,13 @@ var username := ""
 var password := ""
 var error := ""
 var player_node = null
+var character_name = ""
+
+var class_strings = [
+	"Warrior",
+	"Archer",
+	"Wizard"
+]
 
 func get_area(v):
 	return [

@@ -1,6 +1,7 @@
 extends Actor
 class_name Player
 var climbing := int(0)
+var classtype = 0
 ### DEV ONLY
 #var flying = false
 ### END DEV ONLY
@@ -87,6 +88,24 @@ func _physics_process(_delta):
 			animation = puppet_animation
 			sprite.animation = animation
 			sprite.play()
+		if strength != puppet_strength:
+			print("remote client changed strength: ", strength, " -> ", puppet_strength)
+			strength = puppet_strength
+		if stamina != puppet_stamina:
+			print("remote client changed stamina: ", stamina, " -> ", puppet_stamina)
+			stamina = puppet_stamina
+		if intellect != puppet_intellect:
+			print("remote client changed intellect: ", intellect, " -> ", puppet_intellect)
+			intellect = puppet_intellect
+		if wisdom != puppet_wisdom:
+			print("remote client changed wisdom: ", wisdom, " -> ", puppet_wisdom)
+			wisdom = puppet_wisdom
+		if dexterity != puppet_dexterity:
+			print("remote client changed dexterity: ", dexterity, " -> ", puppet_dexterity)
+			dexterity = puppet_dexterity
+		if luck != puppet_luck:
+			print("remote client changed luck: ", luck, " -> ", puppet_luck)
+			luck = puppet_luck
 		if max_hp != puppet_max_hp or hp != puppet_hp:
 			max_hp = puppet_max_hp
 			hp = puppet_hp

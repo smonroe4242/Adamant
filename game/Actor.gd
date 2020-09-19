@@ -100,10 +100,19 @@ func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _de
 		puppet_left_flip = l
 #		print("Client: ", name, ": left_flip changed")
 		rset_id(1, 'left_flip', l)
-	if m != puppet_max_hp:
-		puppet_max_hp = m
-#		print("Client: ", name, ": max_hp changed")
-		rset_id(1, 'max_hp', m)
+	if _stamina != puppet_stamina:
+		print("Client: ", name, " changed stamina: ", _stamina, " -> ", puppet_stamina)
+		stamina = puppet_stamina
+		max_hp = stamina * 10
+		if hp > max_hp:
+			hp = max_hp
+			rset_id(1, 'hp', hp)
+		rset_id(1, 'stamina', puppet_stamina)
+		rset_id(1, 'max_hp', max_hp)
+	#if m != puppet_max_hp:
+		#puppet_max_hp = m
+		#print("Client: ", name, ": max_hp changed")
+		#rset_id(1, 'max_hp', m)
 	if h != puppet_hp:
 		puppet_hp = h
 #		print("Client: ", name, ": hp changed")
@@ -117,9 +126,6 @@ func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _de
 		print("Client: ", name, " changed strength: ", _strength, " -> ", puppet_strength)
 		strength = puppet_strength
 		rset_id(1, 'strength', puppet_strength)
-	if _stamina != puppet_stamina:
-		stamina = puppet_stamina
-		rset_id(1, 'stamina', puppet_stamina)
 	if _intellect != puppet_intellect:
 		intellect = puppet_intellect
 		rset_id(1, 'intellect', puppet_intellect)

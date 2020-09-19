@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://client/Client.gd" type="Script" id=1]
 [ext_resource path="res://client/UI.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/fonts/mainfont.tres" type="DynamicFont" id=3]
+[ext_resource path="res://assets/UI/window.tscn" type="PackedScene" id=4]
+[ext_resource path="res://client/CharacterSelect.gd" type="Script" id=5]
+[ext_resource path="res://assets/UI/input_texture_normal.tres" type="StyleBox" id=6]
+[ext_resource path="res://assets/UI/input_texture_focus.tres" type="StyleBox" id=7]
+[ext_resource path="res://client/CharacterCreate.gd" type="Script" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=1]
 
 [node name="Root" type="Node2D"]
 script = ExtResource( 1 )
@@ -11,3 +19,71 @@ __meta__ = {
 }
 
 [node name="UI" parent="." instance=ExtResource( 2 )]
+
+[node name="CharSelect" parent="." instance=ExtResource( 4 )]
+visible = true
+margin_left = 180.0
+margin_right = 361.0
+window_title = "Character Selection  "
+script = ExtResource( 5 )
+
+[node name="Select" type="Button" parent="CharSelect"]
+margin_left = 25.0
+margin_top = 120.475
+margin_right = 77.0
+margin_bottom = 141.475
+custom_fonts/font = ExtResource( 3 )
+text = "Enter"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="New" type="Button" parent="CharSelect"]
+margin_left = 100.0
+margin_top = 120.475
+margin_right = 152.0
+margin_bottom = 141.475
+custom_fonts/font = ExtResource( 3 )
+text = "New"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CharCreate" parent="." instance=ExtResource( 4 )]
+margin_left = 180.0
+margin_top = 60.0
+margin_right = 362.0
+margin_bottom = 211.0
+window_title = "Character Creation   "
+script = ExtResource( 8 )
+
+[node name="LineEdit" type="LineEdit" parent="CharCreate"]
+margin_left = 16.0
+margin_top = 100.0
+margin_right = 166.0
+margin_bottom = 116.0
+custom_styles/focus = ExtResource( 7 )
+custom_styles/normal = ExtResource( 6 )
+custom_fonts/font = ExtResource( 3 )
+placeholder_text = "name"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Create" type="Button" parent="CharCreate"]
+margin_left = 65.0
+margin_top = 120.0
+margin_right = 115.0
+margin_bottom = 140.0
+custom_fonts/font = ExtResource( 3 )
+text = "Create"
+
+[node name="ItemList2" type="ItemList" parent="CharCreate"]
+margin_left = 100.0
+margin_top = 20.0
+margin_right = 165.0
+margin_bottom = 85.0
+custom_styles/bg = SubResource( 1 )
+[connection signal="pressed" from="CharSelect/Select" to="CharSelect" method="_on_Select_pressed"]
+[connection signal="pressed" from="CharSelect/New" to="CharSelect" method="_on_New_pressed"]
+[connection signal="pressed" from="CharCreate/Create" to="CharCreate" method="_on_Create_pressed"]
