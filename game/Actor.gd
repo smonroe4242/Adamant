@@ -12,7 +12,6 @@ enum {
 }
 const GRAV = 10
 var STEP = 150
-var classtype = 0 #SET TO 1 FOR ARCHER
 master var velocity := Vector2(0, 0)
 master var animation := "idle"
 master var left_flip := false
@@ -24,6 +23,7 @@ remote var intellect
 remote var wisdom
 remote var dexterity
 remote var luck
+remote var classtype = 0 #SET TO 1 FOR ARCHER
 master var blocking := false
 master var coords := Vector2(0, 0)
 master var state := STATE_IDLE

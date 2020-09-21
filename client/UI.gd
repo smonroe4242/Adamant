@@ -33,7 +33,7 @@ func _ready():
 	add_child(popups[WELCOME])
 	add_child(popups[CHAR_SHEET])
 	add_child(popups[SYSTEM])
-	popups[WELCOME].popup()
+	#popups[WELCOME].popup()
 	pass # Replace with function body.
 	
 func _character_sheet(p):

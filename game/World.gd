@@ -57,6 +57,7 @@ func set_stats_obj(node, stats):
 	node.max_hp = stats.max_hp
 	node.hp = stats.hp
 	node.blocking = stats.blocking
+	node.classtype = stats.classtype
 	node.get_node("Camera2D").current = false
 	node.set_network_master(1)
 

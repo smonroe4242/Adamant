@@ -1,7 +1,7 @@
 extends Node2D
 # warning-ignore-all:unused_class_variable
 const server_port := 49152 # Port that game traffic goes through
-const tile_size := 16 # Pixel width of a tile
+const tile_size := 32 # Pixel width of a tile
 const chunk_size := 64 # Tile wdith of a chunk
 const chunk_offset := chunk_size * tile_size # Pixel width of a chunk
 const offsetv := Vector2(chunk_offset, chunk_offset) # Pixel offset of a chunk

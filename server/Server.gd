@@ -95,7 +95,7 @@ func initialize_client(id, user, character):
 		spawn = players[user].characters[character].spawn
 	print("INIT AT ", spawn)
 	print("HEY LISTEN ", character)
-	var new_player = load_player_server(id, players[user].characters[character].name, spawn)
+	var new_player = load_player_server(id, players[user].characters[character].name, spawn, players[user].characters[character].class)
 	rpc_id(id, "load_world", spawn)
 	new_player.char_selection = character
 	rpc_id(id, "load_player", id, players[user].characters[character].name, spawn, 
@@ -123,7 +123,7 @@ func load_world_server():
 	world.name = "World"
 	get_node(".").add_child(world)
 
-func load_player_server(id, username, spawn):
+func load_player_server(id, username, spawn, _class):
 #	print("Server: loading player ", username)
 	var this_player = preload("res://server/ServerPlayer.tscn").instance()
 	this_player.set_name(str(id))
@@ -134,6 +134,7 @@ func load_player_server(id, username, spawn):
 	this_player.username = username
 	this_player.max_hp = this_player.stamina * 10
 	this_player.hp = this_player.stamina * 10
+	this_player.classtype = _class
 	var world = get_node("./World")
 	world.actor_map = actor_map
 	world.monster_map = monster_map

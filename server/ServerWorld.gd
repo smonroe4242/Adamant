@@ -89,7 +89,8 @@ func get_stats_obj(node):
 		'animation': node.animation,
 		'max_hp': node.max_hp,
 		'hp': node.hp,
-		'blocking': node.blocking
+		'blocking': node.blocking,
+		'classtype': node.classtype
 	}
 
 remote func update_player_coords(old_coords, new_coords, username):

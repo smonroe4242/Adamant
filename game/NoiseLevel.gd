@@ -132,7 +132,7 @@ func make_ladder(x, y, drop):
 	while floor(simplex.get_noise_2dv(ref + Vector2(x, drop))) == EMPTY:
 		drop += 1
 	var height = drop - y
-	if height < 3:
+	if height < 1:
 		return
 	var fix = Vector2(0, 0 if height & 1 == 1 else -pix / 2)
 	var lad = ladder.instance()
