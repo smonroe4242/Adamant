@@ -84,6 +84,7 @@ margin_top = 20.0
 margin_right = 165.0
 margin_bottom = 85.0
 custom_styles/bg = SubResource( 1 )
+custom_fonts/font = ExtResource( 3 )
 [connection signal="pressed" from="CharSelect/Select" to="CharSelect" method="_on_Select_pressed"]
 [connection signal="pressed" from="CharSelect/New" to="CharSelect" method="_on_New_pressed"]
 [connection signal="pressed" from="CharCreate/Create" to="CharCreate" method="_on_Create_pressed"]

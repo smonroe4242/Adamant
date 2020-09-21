@@ -1,7 +1,6 @@
 extends Actor
 class_name Player
 var climbing := int(0)
-var classtype = 0
 ### DEV ONLY
 #var flying = false
 ### END DEV ONLY

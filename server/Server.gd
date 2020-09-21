@@ -53,7 +53,9 @@ func _client_disconnect(id):
 	if deadClient == null:
 		print("Server: Not a node in tree")
 		return
-	players[c.name].characters[players[c.name].char_selection].spawn = deadClient.position
+	print("HEY ", c.id)
+	players[c.accname].characters[c.cid].spawn = deadClient.position
+	print("SPAWNING AT + ", players[c.accname].characters[c.cid].spawn)
 # warning-ignore:unsafe_method_access
 	get_node("World").remove_dead_actor(id, deadClient.coords)
 	deadClient.queue_free()
@@ -91,6 +93,8 @@ func initialize_client(id, user, character):
 		spawn = players[user].spawn
 	else:
 		spawn = players[user].characters[character].spawn
+	print("INIT AT ", spawn)
+	print("HEY LISTEN ", character)
 	var new_player = load_player_server(id, players[user].characters[character].name, spawn)
 	rpc_id(id, "load_world", spawn)
 	new_player.char_selection = character
@@ -107,7 +111,7 @@ func initialize_client(id, user, character):
 		players[user].characters[character].level
 	)
 	new_player.evaluate_stats()
-	current[id] = {'id': id, 'name': players[user].characters[character].name, 'spawn': spawn}
+	current[id] = {'id': id, 'name': players[user].characters[character].name, 'spawn': spawn, 'accname': user, 'cid': character}
 	pass
 
 remote func server_new_character(id, user, _class, _name):

@@ -12,6 +12,7 @@ enum {
 }
 const GRAV = 10
 var STEP = 150
+var classtype = 0 #SET TO 1 FOR ARCHER
 master var velocity := Vector2(0, 0)
 master var animation := "idle"
 master var left_flip := false
@@ -50,6 +51,7 @@ onready var sprite = $AnimatedSprite
 onready var hitbox = $CollisionShape2D
 onready var weapon = $Weapon/CollisionShape2D
 onready var overhead = $OverheadDisplay
+var archer_frames = preload("res://assets/Archer/archer_frames.tres")
 const ATK_TIME = 0.5
 const DEATH_TIME = 2
 var attack_timer
@@ -83,6 +85,10 @@ func _ready():
 	attack_timer.connect("timeout", self, "_attack_finish")
 	add_child(attack_timer)
 	sprite.animation = animation
+	if classtype == 1:
+		sprite.set_sprite_frames(archer_frames)
+		sprite.set_offset(sprite.get_offset() - Vector2(0,20))
+		#$AnimatedSprite.hide()
 
 func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _dexterity, _luck):
 	if s != puppet_state:
@@ -251,6 +257,5 @@ func _on_Weapon_body_entered(body):
 		print("Client:  with actor ", body.name)
 		rpc_id(1, "request_damage", body.name)
 
-func _process(delta):
-	#print(puppet_strength)
+func _enter_tree():
 	pass

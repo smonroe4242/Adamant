@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://game/Player.gd" type="Script" id=1]
 [ext_resource path="res://game/Actor.tscn" type="PackedScene" id=2]
 [ext_resource path="res://game/Player.tres" type="SpriteFrames" id=3]
 [ext_resource path="res://assets/light.png" type="Texture" id=4]
+[ext_resource path="res://assets/Archer/archer_frames.tres" type="SpriteFrames" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 7.75085, 14.9865 )
@@ -35,3 +36,11 @@ texture = ExtResource( 4 )
 texture_scale = 0.5
 mode = 3
 shadow_enabled = true
+
+[node name="ArcherSprite" type="AnimatedSprite" parent="." index="6"]
+visible = false
+position = Vector2( 0, -20 )
+frames = ExtResource( 5 )
+animation = "jump_end"
+frame = 5
+playing = true
