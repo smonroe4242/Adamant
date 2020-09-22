@@ -15,12 +15,41 @@ var actor_map
 var monster_map
 var level := 0
 var username
+var classtype = 0
 remote var velocity := Vector2(0, 0)
 remote var animation := "idle"
 remote var left_flip := false
 
-remote var hp := 59
-remote var max_hp := 59
+#!
+remote var attributes = {
+	'hp': 59,
+	'max_hp': 59,
+	'mana': 0,
+	'max_mana': 0,
+	'strength': 10,
+	'stamina': 10,
+	'intellect': 10,
+	'wisdom': 10,
+	'dexterity': 10,
+	'luck': 10,
+	'classtype': 0
+}
+
+remote var puppet_attributes = {
+	'hp': 100,
+	'max_hp': 100,
+	'mana': 0,
+	'max_mana': 100,
+	'strength': 10,
+	'stamina': 10,
+	'intellect': 10,
+	'wisdom': 10,
+	'dexterity': 10,
+	'luck': 10,
+	'classtype': 0	
+}
+#!
+
 remote var mana := 0
 remote var max_mana := 0
 remote var strength := 10
@@ -39,8 +68,6 @@ remote var puppet_velocity := velocity
 remote var puppet_animation := animation
 remote var puppet_left_flip := left_flip
 
-remote var puppet_hp := hp
-remote var puppet_max_hp := max_hp
 remote var puppet_mana := mana
 remote var puppet_max_mana := max_mana
 remote var puppet_strength := strength
@@ -62,20 +89,21 @@ func _ready():
 	puppet_position = position
 	puppet_animation = animation
 	puppet_left_flip = left_flip
-	puppet_max_hp = max_hp
-	puppet_hp = hp
-	puppet_strength = strength
-	puppet_stamina = stamina
-	puppet_intellect = intellect
-	puppet_wisdom = wisdom
-	puppet_dexterity = dexterity
-	puppet_luck = luck
+	
+	#!
+	for key in attributes.keys():
+		puppet_attributes[key] = attributes[key]
+	#!
+	
 	puppet_state = state
 	puppet_coords = coords
 	puppet_effects = effects
 ### TODO master and pupper
 #remote
-func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _dexterity, _luck):
+func set_puppet_vars(id, p, a, l, b, s, new_attributes):
+	print("A: ", new_attributes)
+	print("B: ", attributes)
+	print("C: ", puppet_attributes)
 	if puppet_position != position:
 #		print("Server: telling ", id, "that position changed: ", p, ", ", position, ", ", puppet_position)
 		rset_unreliable_id(id, 'puppet_position', p)
@@ -85,30 +113,18 @@ func set_puppet_vars(id, p, a, l, m, h, b, s, _strength, _stamina, _intellect, _
 	if puppet_left_flip != left_flip:
 #		print("Server: telling ", id, "that left_flip changed")
 		rset_id(id, 'puppet_left_flip', l)
-	if puppet_stamina != stamina:
-		rset_id(id, 'puppet_stamina', _stamina)
-		rset_id(id, 'puppet_max_hp', _stamina * 10)
-		print(stamina, " | puppet: ", puppet_stamina, " _: ", _stamina)
-		print(puppet_max_hp, "|", max_hp, "|", m)
-	if puppet_hp != hp:
-#		print("Server: telling ", id, "that hp changed to ", h)
-		rset_id(id, 'puppet_hp', h)
 	if puppet_blocking != blocking:
 #		print("Server: telling ", id, "that blocking changed to ", b)
 		rset_id(id, 'puppet_blocking', b)
 	if puppet_state != state:
 		rset_id(id, 'puppet_state', s)
-	if puppet_strength != strength:
-		rset_id(id, 'puppet_strength', _strength)
-		print(strength, " | puppet: ", puppet_strength, " _: ", _strength)
-	if puppet_intellect != intellect:
-		rset_id(id, 'puppet_intellect', _intellect)
-	if puppet_wisdom != wisdom:
-		rset_id(id, 'puppet_wisdom', _wisdom)
-	if puppet_dexterity != dexterity:
-		rset_id(id, 'puppet_dexterity', _dexterity)
-	if puppet_luck != luck:
-		rset_id(id, 'puppet_luck', _luck)
+		
+	#!
+	for key in puppet_attributes.keys():
+		if attributes[key] != puppet_attributes[key]:
+			rset_id(id, 'puppet_attributes', new_attributes)
+			print("NEW_STATS_OBJ: changing " + key)
+	#!
 
 remote func request_damage(target):
 	# a naively trusting damage calculation
@@ -121,13 +137,13 @@ remote func request_damage(target):
 		print("Server: Child ", target, " was not found")
 
 func damage(amt):
-	if (hp - amt <= 0):
-		hp = 0
+	if (attributes.hp - amt <= 0):
+		attributes.hp = 0
 		die()
-		rpc("damage", hp)
+		rpc("damage", attributes.hp)
 		rpc("die")
 	else:
-		hp -= amt
+		attributes.hp -= amt
 		rpc("damage", amt)
 
 func die():
@@ -146,4 +162,6 @@ func _process(delta):
 	#print("name: ", name, " str: ", strength)
 
 func evaluate_stats():
-	max_hp = stamina * 10
+	attributes.max_hp = attributes.stamina * 10
+	if attributes.max_hp < attributes.hp:
+		attributes.hp = attributes.max_hp

@@ -64,25 +64,18 @@ remote func load_world(origin):
 	get_node(".").add_child(world)
 	$UI/CanvasLayer/TextureButton.show()
 
-remote func load_player(id, username, origin, max_hp, hp, strength, stamina, intellect, wisdom, dexterity, luck, _class, level):
+remote func load_player(id, username, origin, _class, level, new_attributes):
 	print("Client: loading player ", username)
 	var this_player = preload("res://game/Player.tscn").instance()
 	this_player.set_name(str(id))
 	this_player.set_display_name(username)
 	this_player.position = origin
-	this_player.max_hp = max_hp
-	this_player.hp = hp
-	this_player.strength = strength
-	this_player.stamina = stamina
-	this_player.intellect = intellect
-	this_player.wisdom = wisdom
-	this_player.dexterity = dexterity
-	this_player.luck = luck
 	this_player.classtype = _class
 	this_player.level = level
+	this_player.attributes = new_attributes
 	this_player.set_network_master(id)
 	this_player.get_node("Camera2D").current = true
 	this_player.connect("player_entered", get_node("./World"), "player_entered")
 	Global.player_node = this_player
-	print("Client: LOAD_PLAYER: hp: ", this_player.hp, ", max_hp: ", this_player.max_hp, ", stam: ", this_player.stamina)
+	print("Client: LOAD_PLAYER: hp: ", this_player.attributes.hp, ", max_hp: ", this_player.attributes.max_hp, ", stam: ", this_player.attributes.stamina)
 	get_node("./World").call_deferred("add_child", this_player)

@@ -54,8 +54,8 @@ func set_stats_obj(node, stats):
 	node.set_display_name(stats.user)
 	node.position = stats.position
 	node.animation = stats.animation
-	node.max_hp = stats.max_hp
-	node.hp = stats.hp
+	node.attributes.max_hp = stats.attributes.max_hp
+	node.attributes.hp = stats.attributes.hp
 	node.blocking = stats.blocking
 	node.classtype = stats.classtype
 	node.get_node("Camera2D").current = false

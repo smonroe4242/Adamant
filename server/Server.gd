@@ -99,16 +99,9 @@ func initialize_client(id, user, character):
 	rpc_id(id, "load_world", spawn)
 	new_player.char_selection = character
 	rpc_id(id, "load_player", id, players[user].characters[character].name, spawn, 
-		new_player.hp, 
-		new_player.max_hp, 
-		new_player.strength, 
-		new_player.stamina, 
-		new_player.intellect,
-		new_player.wisdom,
-		new_player.dexterity,
-		new_player.luck,
 		players[user].characters[character].class,
-		players[user].characters[character].level
+		players[user].characters[character].level,
+		new_player.attributes
 	)
 	new_player.evaluate_stats()
 	current[id] = {'id': id, 'name': players[user].characters[character].name, 'spawn': spawn, 'accname': user, 'cid': character}
@@ -132,8 +125,8 @@ func load_player_server(id, username, spawn, _class):
 	this_player.set_network_master(id)
 	this_player.actor_map = actor_map
 	this_player.username = username
-	this_player.max_hp = this_player.stamina * 10
-	this_player.hp = this_player.stamina * 10
+	this_player.attributes.max_hp = this_player.attributes.stamina * 10
+	this_player.attributes.hp = this_player.attributes.stamina * 10
 	this_player.classtype = _class
 	var world = get_node("./World")
 	world.actor_map = actor_map

@@ -9,9 +9,9 @@ func _ready():
 
 func _process(delta):
 	if not Global.player_node == null:
-		health.max_value = Global.player_node.max_hp
-		health.set_value(Global.player_node.hp)
-		title.text = str(Global.player_node.hp) + "/" + str(Global.player_node.max_hp)
+		health.max_value = Global.player_node.attributes.max_hp
+		health.set_value(Global.player_node.attributes.hp)
+		title.text = str(Global.player_node.attributes.hp) + "/" + str(Global.player_node.attributes.max_hp)
 
 func update_display(max_hp, hp):
 	health.max_value = max_hp

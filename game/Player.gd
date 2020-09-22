@@ -39,7 +39,7 @@ func _physics_process(_delta):
 #			return
 #		el
 		### END DEV ONLY
-		if hp > 0:
+		if attributes.hp > 0:
 			# client og code
 			if Input.is_action_pressed('block') and attacking != true:
 				_block(on_floor)
@@ -78,7 +78,7 @@ func _physics_process(_delta):
 
 		if sprite.animation != animation:
 			sprite.play(animation)
-		set_vars(position, animation, left_flip, max_hp, hp, blocking, state, strength, stamina, intellect, wisdom, dexterity, luck)
+		set_vars(position, animation, left_flip, blocking, state, attributes)
 	else:
 		position = puppet_position
 		left_flip = puppet_left_flip
@@ -87,33 +87,18 @@ func _physics_process(_delta):
 			animation = puppet_animation
 			sprite.animation = animation
 			sprite.play()
-		if strength != puppet_strength:
-			print("remote client changed strength: ", strength, " -> ", puppet_strength)
-			strength = puppet_strength
-		if stamina != puppet_stamina:
-			print("remote client changed stamina: ", stamina, " -> ", puppet_stamina)
-			stamina = puppet_stamina
-		if intellect != puppet_intellect:
-			print("remote client changed intellect: ", intellect, " -> ", puppet_intellect)
-			intellect = puppet_intellect
-		if wisdom != puppet_wisdom:
-			print("remote client changed wisdom: ", wisdom, " -> ", puppet_wisdom)
-			wisdom = puppet_wisdom
-		if dexterity != puppet_dexterity:
-			print("remote client changed dexterity: ", dexterity, " -> ", puppet_dexterity)
-			dexterity = puppet_dexterity
-		if luck != puppet_luck:
-			print("remote client changed luck: ", luck, " -> ", puppet_luck)
-			luck = puppet_luck
-		if max_hp != puppet_max_hp or hp != puppet_hp:
-			max_hp = puppet_max_hp
-			hp = puppet_hp
-			overhead.update_display(max_hp, hp)
 		if puppet_blocking != blocking:
 			if puppet_blocking:
 				_block(on_floor)
 			else:
 				_block_finish()
+		
+		for key in attributes.keys():
+			if attributes[key] != puppet_attributes[key]:
+				print("remote client changed ", key, ", ", attributes[key], " -> ", puppet_attributes[key])
+				if key == 'hp' or key == 'max_hp':
+					overhead.update_display(puppet_attributes['max_hp'], puppet_attributes['hp'])
+				attributes[key] = puppet_attributes[key]
 
 	sprite.set_flip_h(left_flip)
 

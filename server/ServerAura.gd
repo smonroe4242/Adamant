@@ -24,7 +24,7 @@ func apply(actor):
 	print("Apply!")
 	if persistent == true:
 		effect.apply(actor)
-	print(actor.strength)
+	print(actor.attributes.stamina)
 
 func process(actor):
 	if persistent != true:
@@ -34,13 +34,13 @@ func process(actor):
 func remove(actor):
 	if persistent == true:
 		effect.remove(actor)
+		actor.evaluate_stats()
 		print("Removed!")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if duration > 0.0:
 		if duration > delta:
-			print(duration)
 			duration -= delta
 		else:
 			print("Remove!")

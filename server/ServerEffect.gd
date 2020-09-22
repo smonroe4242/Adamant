@@ -46,23 +46,23 @@ func _ready():
 	pass # Replace with function body.
 
 func apply(actor):
-	actor.hp -= damage
-	actor.hp += health
-	actor.mana += mana
-	actor.strength += strength
-	actor.stamina += stamina
-	actor.intellect += intellect
-	actor.wisdom += wisdom
-	actor.dexterity += dexterity
-	actor.luck += luck
+	actor.attributes.hp -= damage
+	actor.attributes.hp += health
+	actor.attributes.mana += mana
+	actor.attributes.strength += strength
+	actor.attributes.stamina += stamina
+	actor.attributes.intellect += intellect
+	actor.attributes.wisdom += wisdom
+	actor.attributes.dexterity += dexterity
+	actor.attributes.luck += luck
 
 func remove(actor):
-	actor.strength -= strength
-	actor.stamina -= stamina
-	actor.intellect -= intellect
-	actor.wisdom -= wisdom
-	actor.dexterity -= dexterity
-	actor.luck -= luck
+	actor.attributes.strength -= strength
+	actor.attributes.stamina -= stamina
+	actor.attributes.intellect -= intellect
+	actor.attributes.wisdom -= wisdom
+	actor.attributes.dexterity -= dexterity
+	actor.attributes.luck -= luck
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

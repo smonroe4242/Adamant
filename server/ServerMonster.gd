@@ -25,7 +25,7 @@ func _physics_process(_delta):
 	for chunk in Global.get_area(coords):
 		if actor_map.has(chunk):
 			for player in actor_map[chunk]:
-				rpc_unreliable_id(player, "set_vars", position, velocity, animation, left_flip, max_hp, hp, coords)
+				rpc_unreliable_id(player, "set_vars", position, velocity, animation, left_flip, coords)
 
 func die():
 	return

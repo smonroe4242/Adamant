@@ -87,8 +87,8 @@ func get_stats_obj(node):
 		'user': node.username,
 		'position': node.position,
 		'animation': node.animation,
-		'max_hp': node.max_hp,
-		'hp': node.hp,
+		'max_hp': node.attributes.max_hp,
+		'hp': node.attributes.hp,
 		'blocking': node.blocking,
 		'classtype': node.classtype
 	}
@@ -192,8 +192,8 @@ func spawn_monsters(chunk):
 	mob.position = chunk * Global.offsetv
 	mob.name = "M" + str(mob.get_instance_id())
 	mob.level = chunk.y
-	mob.max_hp = chunk.y * 100
-	mob.hp = mob.max_hp
+	mob.attributes.max_hp = chunk.y * 100
+	mob.attributes.hp = mob.attributes.max_hp
 	call_deferred("add_child", mob)
 	if not monster_map.has(chunk):
 		monster_map[chunk] = {}

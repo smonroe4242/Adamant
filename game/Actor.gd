@@ -15,14 +15,33 @@ var STEP = 150
 master var velocity := Vector2(0, 0)
 master var animation := "idle"
 master var left_flip := false
-master var hp
-master var max_hp
-remote var strength
-remote var stamina
-remote var intellect
-remote var wisdom
-remote var dexterity
-remote var luck
+
+remote var attributes = {
+	'hp': 100,
+	'max_hp': 100,
+	'mana': 0,
+	'max_mana': 100,
+	'strength': 10,
+	'stamina': 10,
+	'intellect': 10,
+	'wisdom': 10,
+	'dexterity': 10,
+	'luck': 10,
+	'classtype': 0
+}
+remote var puppet_attributes = {
+	'hp': 100,
+	'max_hp': 100,
+	'mana': 0,
+	'max_mana': 100,
+	'strength': 10,
+	'stamina': 10,
+	'intellect': 10,
+	'wisdom': 10,
+	'dexterity': 10,
+	'luck': 10,
+	'classtype': 0
+}
 remote var classtype = 0 #SET TO 1 FOR ARCHER
 master var blocking := false
 master var coords := Vector2(0, 0)
@@ -36,14 +55,6 @@ remote var puppet_position := position
 remote var puppet_velocity := velocity
 remote var puppet_animation := animation
 remote var puppet_left_flip := left_flip
-remote var puppet_hp
-remote var puppet_max_hp
-remote var puppet_strength
-remote var puppet_stamina
-remote var puppet_intellect
-remote var puppet_wisdom
-remote var puppet_dexterity
-remote var puppet_luck
 remote var puppet_blocking := blocking
 remote var puppet_coords := coords
 remote var puppet_state := state
@@ -61,21 +72,17 @@ signal player_entered
 func _ready():
 	overhead.position.y -= hitbox.get_shape().get_extents().y
 	overhead.title.text = displayName
-	overhead.update_display(max_hp, hp)
+	overhead.update_display(attributes.max_hp, attributes.hp)
 	coords = Vector2(int(floor(position.x / Global.offsetv.x)), int(floor(position.y / Global.offsetv.y)))
 	if is_network_master():
 		get_parent().rpc_id(1, "get_local_actors", coords, displayName)
 	puppet_position = position
 	puppet_animation = animation
 	puppet_left_flip = left_flip
-	puppet_hp = hp
-	puppet_max_hp = max_hp
-	puppet_strength = strength
-	puppet_stamina = stamina
-	puppet_intellect = intellect
-	puppet_wisdom = wisdom
-	puppet_dexterity = dexterity
-	puppet_luck = luck
+	
+	for key in attributes.keys():
+		puppet_attributes[key] = attributes[key]
+	
 	puppet_coords = coords
 	puppet_state = state
 	weapon.disabled = true
@@ -90,7 +97,7 @@ func _ready():
 		sprite.set_offset(sprite.get_offset() - Vector2(0,20))
 		#$AnimatedSprite.hide()
 
-func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _dexterity, _luck):
+func set_vars(p, a, l, b, s, new_attributes):
 	if s != puppet_state:
 		puppet_state = s
 		rset_unreliable_id(1, 'state', s)
@@ -106,45 +113,17 @@ func set_vars(p, a, l, m, h, b, s, _strength, _stamina, _intellect, _wisdom, _de
 		puppet_left_flip = l
 #		print("Client: ", name, ": left_flip changed")
 		rset_id(1, 'left_flip', l)
-	if _stamina != puppet_stamina:
-		print("Client: ", name, " changed stamina: ", _stamina, " -> ", puppet_stamina)
-		stamina = puppet_stamina
-		max_hp = stamina * 10
-		if hp > max_hp:
-			hp = max_hp
-			rset_id(1, 'hp', hp)
-		rset_id(1, 'stamina', puppet_stamina)
-		rset_id(1, 'max_hp', max_hp)
-	#if m != puppet_max_hp:
-		#puppet_max_hp = m
-		#print("Client: ", name, ": max_hp changed")
-		#rset_id(1, 'max_hp', m)
-	if h != puppet_hp:
-		puppet_hp = h
-#		print("Client: ", name, ": hp changed")
-		rset_id(1, 'hp', h)
 	if b != puppet_blocking:
 		puppet_blocking = b
 #		print("Client: ", name, ": blocking changed")
 		rset_id(1, 'blocking', b)
-	#stats get set to puppet vars as they are controlled by server???
-	if _strength != puppet_strength:
-		print("Client: ", name, " changed strength: ", _strength, " -> ", puppet_strength)
-		strength = puppet_strength
-		rset_id(1, 'strength', puppet_strength)
-	if _intellect != puppet_intellect:
-		intellect = puppet_intellect
-		rset_id(1, 'intellect', puppet_intellect)
-	if _wisdom != puppet_wisdom:
-		wisdom = puppet_wisdom
-		rset_id(1, 'wisdom', puppet_wisdom)
-	if _dexterity != puppet_dexterity:
-		dexterity = puppet_dexterity
-		rset_id(1, 'dexterity', puppet_dexterity)
-	if _luck != puppet_luck:
-		luck = puppet_luck
-		rset_id(1, 'luck', puppet_luck)
 		
+	for key in attributes.keys():
+		if new_attributes[key] != puppet_attributes[key]:
+			print("key: ", key)
+			attributes[key] = puppet_attributes[key]
+			rset_id(1, 'attributes', puppet_attributes)
+			print("NEW_STATS_OBJ: Updated ", key)
 
 func _attack_finish():
 	animation = "idle"
@@ -229,22 +208,22 @@ func update_coords():
 
 remote func damage(amt):
 	if not blocking:
-		hp -= amt
-		overhead.update_display(max_hp, hp)
+		attributes.hp -= amt
+		overhead.update_display(attributes.max_hp, attributes.hp)
 
 remote func die():
 	print("Client: DEATH")
-	hp = 0
+	attributes.hp = 0
 	velocity = Vector2(0, 0)
-	overhead.update_display(max_hp, hp)
+	overhead.update_display(attributes.max_hp, attributes.hp)
 	animation = "death"
 	sprite.connect("animation_finished", self, "respawn")
 
 func respawn():
 	print("Client: Actor respawn ", name)
 	sprite.disconnect("animation_finished", self, "respawn")
-	hp = max_hp
-	overhead.update_display(max_hp, hp)
+	attributes.hp = attributes.max_hp
+	overhead.update_display(attributes.max_hp, attributes.hp)
 	if is_network_master():
 		position = respawn
 		update_coords()
