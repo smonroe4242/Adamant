@@ -17,12 +17,14 @@ func _ready():
 
 
 func _on_Select_pressed():
+	get_parent().find_node("AudioStreamPlayer").play_confirm()
 	get_parent().select_character(Global.username, $ItemList.get_selected_items()[0])
 	self.hide()
 	pass # Replace with function body.
 
 
 func _on_New_pressed():
+	get_parent().find_node("AudioStreamPlayer").play_confirm()
 	self.hide()
 	get_parent().find_node("CharCreate").show()
 	pass # Replace with function body.

@@ -1,5 +1,7 @@
 extends Node2D
 var character_options = []
+onready var audio_player = $AudioStreamPlayer
+onready var sfx_player = $AudioStreamPlayer/SFX
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
 	$UI/CanvasLayer/TextureButton.hide()

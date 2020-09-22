@@ -17,6 +17,7 @@ func _ready():
 	$CanvasLayer/CenterContainer/WindowDialog.popup()
 
 func _on_Button_pressed():
+	$AudioStreamPlayer.play_confirm()
 	var ip = IP.resolve_hostname(server.text, 1)
 	Global.server_ip = ip
 	print("Client: Login: resolve_hostname(): ", server.text, ":", Global.server_ip)

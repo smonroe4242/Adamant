@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/swing.wav-f39f51abb9b8bebf288f77b6303cab05.sample"
+
+[deps]
+
+source_file="res://assets/sound/rpg_sound_pack/RPG Sound Pack/battle/swing.wav"
+dest_files=[ "res://.import/swing.wav-f39f51abb9b8bebf288f77b6303cab05.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

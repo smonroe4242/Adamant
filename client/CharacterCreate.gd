@@ -20,5 +20,6 @@ func _ready():
 
 
 func _on_Create_pressed():
+	get_parent().find_node("AudioStreamPlayer").play_confirm()
 	get_parent().create_character(Global.username, $LineEdit.text, $ItemList2.get_selected_items()[0])
 	self.hide()

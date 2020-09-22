@@ -40,7 +40,6 @@ func _physics_process(_delta):
 	
 	for key in attributes.keys():
 		puppet_attributes[key] = attributes[key]
-	print("DONE CHECK")
 
 func die():
 	print("Server: Player DEATH")

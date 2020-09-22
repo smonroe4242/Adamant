@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://client/Client.gd" type="Script" id=1]
 [ext_resource path="res://client/UI.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://assets/UI/input_texture_normal.tres" type="StyleBox" id=6]
 [ext_resource path="res://assets/UI/input_texture_focus.tres" type="StyleBox" id=7]
 [ext_resource path="res://client/CharacterCreate.gd" type="Script" id=8]
+[ext_resource path="res://client/ClientAudio.gd" type="Script" id=9]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
@@ -85,6 +86,11 @@ margin_right = 165.0
 margin_bottom = 85.0
 custom_styles/bg = SubResource( 1 )
 custom_fonts/font = ExtResource( 3 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+script = ExtResource( 9 )
+
+[node name="SFX" type="AudioStreamPlayer" parent="AudioStreamPlayer"]
 [connection signal="pressed" from="CharSelect/Select" to="CharSelect" method="_on_Select_pressed"]
 [connection signal="pressed" from="CharSelect/New" to="CharSelect" method="_on_New_pressed"]
 [connection signal="pressed" from="CharCreate/Create" to="CharCreate" method="_on_Create_pressed"]

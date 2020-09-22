@@ -8,3 +8,4 @@ db/*.db
 GPATH
 GRTAGS
 GTAGS
+._*

@@ -22,8 +22,8 @@ remote var left_flip := false
 
 #!
 remote var attributes = {
-	'hp': 59,
-	'max_hp': 59,
+	'hp': 100,
+	'max_hp': 100,
 	'mana': 0,
 	'max_mana': 0,
 	'strength': 10,
@@ -101,9 +101,6 @@ func _ready():
 ### TODO master and pupper
 #remote
 func set_puppet_vars(id, p, a, l, b, s, new_attributes):
-	print("A: ", new_attributes)
-	print("B: ", attributes)
-	print("C: ", puppet_attributes)
 	if puppet_position != position:
 #		print("Server: telling ", id, "that position changed: ", p, ", ", position, ", ", puppet_position)
 		rset_unreliable_id(id, 'puppet_position', p)

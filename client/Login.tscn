@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://assets/fonts/compass-pro-v1.1/CompassPro.otf" type="DynamicFontData" id=1]
 [ext_resource path="res://client/Login.gd" type="Script" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://assets/UI/input_texture_normal.tres" type="StyleBox" id=6]
 [ext_resource path="res://assets/fonts/mainfont.tres" type="DynamicFont" id=7]
 [ext_resource path="res://client/classes_list.gd" type="Script" id=8]
+[ext_resource path="res://client/LoginAudio.gd" type="Script" id=9]
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 1 )
@@ -96,7 +97,6 @@ __meta__ = {
 }
 
 [node name="CharacterDialog" parent="CanvasLayer/CenterContainer" instance=ExtResource( 4 )]
-visible = true
 margin_left = 170.0
 margin_top = 68.0
 margin_right = 341.0
@@ -104,6 +104,7 @@ margin_bottom = 219.0
 window_title = "Character Selection"
 
 [node name="WindowDialog" parent="CanvasLayer/CenterContainer" instance=ExtResource( 4 )]
+visible = true
 margin_left = 171.0
 margin_top = 68.0
 margin_right = 341.0
@@ -218,4 +219,11 @@ scale = Vector2( 6, 5 )
 texture = ExtResource( 5 )
 region_enabled = true
 region_rect = Rect2( 465.643, 126.992, 45.1249, 43.7443 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+script = ExtResource( 9 )
+
+[node name="SFX" type="AudioStreamPlayer" parent="AudioStreamPlayer"]
+bus = "SFX"
+[connection signal="mouse_entered" from="CanvasLayer/CenterContainer/WindowDialog/GridContainer/Button" to="AudioStreamPlayer" method="_on_Button_mouse_entered"]
 [connection signal="pressed" from="CanvasLayer/CenterContainer/WindowDialog/GridContainer/Button" to="." method="_on_Button_pressed"]

@@ -11,7 +11,7 @@ enum {
 	STATE_AIR
 }
 const GRAV = 10
-var STEP = 150
+var STEP = 400
 master var velocity := Vector2(0, 0)
 master var animation := "idle"
 master var left_flip := false
@@ -133,6 +133,7 @@ func _attack_finish():
 	state = STATE_IDLE
 
 remote func _attack():
+	get_parent().get_parent().audio_player.play_swing()
 	attacking = true
 	weapon.disabled = false
 	if sprite.frame == 4 and animation == "attack_light":
@@ -155,7 +156,7 @@ func _block_finish():
 	state = STATE_IDLE
 
 func _walk_left(on_floor):
-	velocity.x = -STEP
+	velocity.x = -(STEP / 2)
 	if on_floor:
 		animation = "run"
 	if left_flip == false:
@@ -164,7 +165,7 @@ func _walk_left(on_floor):
 	state = STATE_MOVE
 
 func _walk_right(on_floor):
-	velocity.x = STEP
+	velocity.x = STEP / 2
 	if on_floor:
 		animation = "run"
 	if left_flip == true:
@@ -179,7 +180,7 @@ func _hold_still(on_floor):
 		state = STATE_IDLE
 
 func _jump():
-	velocity.y = -STEP
+	velocity.y = -(STEP * 0.60)
 	animation = "jump_start"
 	jumping = true
 	snap = Vector2(0, 0)
