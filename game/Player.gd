@@ -96,9 +96,9 @@ func _physics_process(_delta):
 		for key in attributes.keys():
 			if attributes[key] != puppet_attributes[key]:
 				print("remote client changed ", key, ", ", attributes[key], " -> ", puppet_attributes[key])
+				puppet_attributes[key] = attributes[key]
 				if key == 'hp' or key == 'max_hp':
 					overhead.update_display(puppet_attributes['max_hp'], puppet_attributes['hp'])
-				attributes[key] = puppet_attributes[key]
 
 	sprite.set_flip_h(left_flip)
 

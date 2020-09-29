@@ -11,7 +11,7 @@ enum {
 	STATE_AIR
 }
 const GRAV = 10
-var STEP = 400
+var STEP = 1400
 master var velocity := Vector2(0, 0)
 master var animation := "idle"
 master var left_flip := false
@@ -120,7 +120,7 @@ func set_vars(p, a, l, b, s, new_attributes):
 		
 	for key in attributes.keys():
 		if new_attributes[key] != puppet_attributes[key]:
-			print("key: ", key)
+			print("old", str(attributes[key]), "new", str(puppet_attributes[key]))
 			attributes[key] = puppet_attributes[key]
 			rset_id(1, 'attributes', puppet_attributes)
 			print("NEW_STATS_OBJ: Updated ", key)
@@ -211,6 +211,7 @@ remote func damage(amt):
 	if not blocking:
 		attributes.hp -= amt
 		overhead.update_display(attributes.max_hp, attributes.hp)
+		get_parent().get_parent().audio_player.play_hit()
 
 remote func die():
 	print("Client: DEATH")

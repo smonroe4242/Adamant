@@ -7,7 +7,66 @@ var chunks = {}
 var origin = Vector2(0, 0)
 enum biome {Underworld, Ground, Overworld}
 
+onready var name_seed_file = 'res://namedata'
+var name_seeds = []
+var name_table = {}
+var name_rng
+
+func prepare_name_table():
+	var f = File.new()
+	if f.file_exists("user://nametab"):
+		print("Loading existing name table data")
+		f.open("user://nametab", File.READ)
+		name_table = JSON.parse(f.get_as_text()).result
+		print(name_table)
+	else:
+		f.open(name_seed_file, File.READ)
+		print("Preparing name table")
+		while not f.eof_reached():
+			name_seeds.append(f.get_line())
+		f.close()
+		print("Counting name character occurances...")
+		for val in name_seeds:
+			var lval = val.to_lower()
+			for i in range(0, lval.length() - 2):
+				if name_table.has(lval[i]):
+					if name_table[lval[i]].has(lval[i + 1]):
+						name_table[lval[i]][lval[i + 1]] = name_table[lval[i]][lval[i + 1]] + 1
+					else:
+						name_table[lval[i]][lval[i + 1]] = 1
+					name_table[lval[i]].weight = name_table[lval[i]].weight + 1
+				else:
+					name_table[lval[i]] = { 'weight': 1 }
+					name_table[lval[i]][lval[i + 1]] = 1
+		print("Storing calculated name data for later...")
+		var save_table = File.new()
+		save_table.open("user://nametab", File.WRITE)
+		save_table.store_line(to_json(name_table))
+		save_table.close()
+
+func gen_chunk_name(coords):
+	name_rng.seed = Global.pair(coords.x, coords.y)
+	var ret = ""
+	while ret.length() < 6 or name_rng.randi() % 8 == 0:
+		var last = null
+		var selection = name_table.keys()[name_rng.randi() % name_table.size()]
+		for k in name_table[selection].keys():
+			if k == 'weight':
+				pass
+			elif float(name_table[selection][k]) / float(name_table[selection].weight) >= name_rng.randf():
+				ret = ret + k
+				last = k
+				break
+		if (last == null):
+			last = name_table[selection][name_table[selection].keys()[0]]
+		else:
+			if last == '\n':
+				break
+	return ret
+
 func _ready():
+	name_rng = RandomNumberGenerator.new()
+	prepare_name_table()
 	make_noise()
 	respawn(origin)
 
@@ -54,8 +113,8 @@ func set_stats_obj(node, stats):
 	node.set_display_name(stats.user)
 	node.position = stats.position
 	node.animation = stats.animation
-	node.attributes.max_hp = stats.attributes.max_hp
-	node.attributes.hp = stats.attributes.hp
+	node.attributes.max_hp = stats.max_hp
+	node.attributes.hp = stats.hp
 	node.blocking = stats.blocking
 	node.classtype = stats.classtype
 	node.get_node("Camera2D").current = false
@@ -112,4 +171,5 @@ remote func unload_monster(monster_name):
 
 func player_entered(old_coords, new_coords, username):
 	rpc_id(1, "update_player_coords", old_coords, new_coords, username)
+	Global.cur_chunk_name = gen_chunk_name(new_coords)
 	gen_block(new_coords)

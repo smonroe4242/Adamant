@@ -120,7 +120,7 @@ func set_puppet_vars(id, p, a, l, b, s, new_attributes):
 	for key in puppet_attributes.keys():
 		if attributes[key] != puppet_attributes[key]:
 			rset_id(id, 'puppet_attributes', new_attributes)
-			print("NEW_STATS_OBJ: changing " + key)
+			print("NEW_STATS_OBJ: changing ", key, ", ", str(puppet_attributes[key]), " -> ", str(attributes[key]), ", ", str(new_attributes[key]))
 	#!
 
 remote func request_damage(target):

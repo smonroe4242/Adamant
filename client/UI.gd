@@ -77,3 +77,6 @@ func system_select_item(item):
 func _process(delta):
 	if Input.is_action_just_pressed("ui_cancel"):
 		_system()
+	if $Label.get_text() != Global.cur_chunk_name:
+		$Label.set_text(Global.cur_chunk_name)
+		print("Changed label")

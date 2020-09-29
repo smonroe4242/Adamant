@@ -12,6 +12,7 @@ var password := ""
 var error := ""
 var player_node = null
 var character_name = ""
+var cur_chunk_name = ""
 
 var class_strings = [
 	"Warrior",
@@ -182,3 +183,17 @@ func set_err_msg(err, to_print = true):
 		error = 'UNKNOWN ENGINE ERROR: This is not a known error code, please contact a developer.'
 	if to_print:
 		print(header + error)
+
+#math helpers
+
+#szudzik pair, supporting negative numbers
+func pair(x, y):
+	var xx = x * 2
+	var yy = y * 2
+	if x < 0:
+		xx = x * -2 - 1
+	if y < 0:
+		yy = y * -2 - 1
+	if xx >= yy:
+		return xx * xx + xx + yy
+	return yy * yy + xx

@@ -5,6 +5,7 @@ var ui_hover = load("res://assets/sound/rpg_sound_pack/RPG Sound Pack/interface/
 var ui_confirm = load("res://assets/sound/rpg_sound_pack/RPG Sound Pack/battle/sword-unsheathe.wav")
 var sfx_node
 var swing = load("res://assets/sound/rpg_sound_pack/RPG Sound Pack/battle/swing.wav")
+var hitsound = load("res://assets/sound/rpg_sound_pack/RPG Sound Pack/interface/interface5.wav")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -26,4 +27,8 @@ func play_confirm():
 
 func play_swing():
 	sfx_node.set_stream(swing)
+	sfx_node.play()
+
+func play_hit():
+	sfx_node.set_stream(hitsound)
 	sfx_node.play()
